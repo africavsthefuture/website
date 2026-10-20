@@ -1,0 +1,20 @@
+---
+import Base from "../layouts/Base.astro";
+import { site, utm } from "../site.config.mjs";
+// TODO(CONTACT): no public contact email was found on the live site or in the repos.
+// Add one here (e.g. contact@africavsthefuture.xyz) once the mailbox exists.
+const contactEmail: string | null = null;
+const ch = Object.fromEntries(site.channels.map((c) => [c.id, c]));
+---
+<Base title="Contact" description="How to reach Africa vs The Future: reply to the Substack brief or message us on Bluesky or X.">
+  <div class="wrap">
+    <header class="page-head"><p class="eyebrow">Contact</p><h1>Talk to us.</h1>
+      <p class="lede">Ideas, corrections, partnerships or press: these are the quickest routes today.</p></header>
+    <div class="grid grid-3">
+      <a class="card" href={utm(site.substack.home, "contact")} rel="noopener" style="padding:1.5rem;text-decoration:none"><h2 style="font-size:1.4rem">Substack</h2><p class="card-sub">Subscribe, then reply to any email or comment on a post.</p></a>
+      {ch.bluesky.url && <a class="card" href={utm(ch.bluesky.url, "contact")} rel="noopener" style="padding:1.5rem;text-decoration:none"><h2 style="font-size:1.4rem">Bluesky</h2><p class="card-sub">@{site.bluesky.handle}</p></a>}
+      {ch.x.url && <a class="card" href={utm(ch.x.url, "contact")} rel="noopener" style="padding:1.5rem;text-decoration:none"><h2 style="font-size:1.4rem">X</h2><p class="card-sub">@AfricaVTFuture</p></a>}
+      {contactEmail && <a class="card" href={`mailto:${contactEmail}`} style="padding:1.5rem;text-decoration:none"><h2 style="font-size:1.4rem">Email</h2><p class="card-sub">{contactEmail}</p></a>}
+    </div>
+  </div>
+</Base>

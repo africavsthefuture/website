@@ -1,0 +1,7 @@
+---
+const { facts, title = "Key facts" } = Astro.props as { facts: { k: string; v: string }[]; title?: string };
+---
+<aside class="keyfacts" aria-label={title}>
+  <p class="eyebrow">{title}</p>
+  <dl>{facts.map((f) => (<div><dt>{f.k}</dt><dd set:html={f.v} /></div>))}</dl>
+</aside>

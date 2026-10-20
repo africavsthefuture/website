@@ -1,0 +1,29 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../site.config.mjs";
+// TODO(LEGAL): draft only. This describes how THIS build behaves and must be
+// reviewed (UK GDPR / PECR) before launch, especially once ads or analytics are on.
+const updated = "2026-10-19";
+---
+<Base title="Privacy policy" description="How the Africa vs The Future website handles personal data, cookies and third-party services.">
+  <div class="wrap">
+    <header class="page-head"><p class="eyebrow">Privacy</p><h1>Privacy policy</h1><p class="meta">Last updated <time datetime={updated}>19 October 2026</time></p></header>
+    <div class="prose">
+      <p><strong>Draft:</strong> this policy describes the current build of the site and is awaiting review. <!-- TODO(LEGAL): add the data controller's legal name and a contact address. --></p>
+      <h2>What this site collects</h2>
+      <p>The site itself sets no cookies and runs no tracking or advertising scripts. Pages are static HTML.</p>
+      <h2>Newsletter sign-up (Substack)</h2>
+      <p>If you enter your email in a subscribe form, it is sent directly to Substack, which runs our newsletter at {site.substack.home}. Substack's own privacy policy and terms then apply. We receive your subscription through Substack.</p>
+      {site.features.store && (<><h2>Purchases (Gumroad)</h2>
+      <p>Store links take you to Gumroad, which processes checkout and payment under its own privacy policy.</p></>)}
+      <h2>Embedded audio</h2>
+      <p>Podcast players stream audio from SoundCloud's servers only when you press play.</p>
+      <h2>Links to other platforms</h2>
+      <p>Links to Medium, Substack, SoundCloud, YouTube, Bluesky, X, Instagram{site.features.store ? ", TikTok and Gumroad" : " and TikTok"} include campaign parameters (UTM tags). These tell us which page a visit came from. They contain no personal data.</p>
+      <h2>Analytics and advertising</h2>
+      <p>None are active today. If we add privacy-friendly analytics or advertising, this page will be updated first. Where the law requires it, we will ask for your consent through a consent banner that follows the IAB Transparency &amp; Consent Framework.</p>
+      <h2>Your rights</h2>
+      <p>Under UK GDPR you can ask for access to, correction of, or deletion of personal data we hold. For newsletter data, you can unsubscribe at any time from any Substack email.</p>
+    </div>
+  </div>
+</Base>

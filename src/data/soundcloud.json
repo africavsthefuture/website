@@ -1,0 +1,21 @@
+{
+ "show": {
+  "title": "africa vs the future podcast",
+  "description": "Podcast by africa vs the future podcast",
+  "url": "https://soundcloud.com/africa-vs-the-future-podcast"
+ },
+ "episodes": [
+  {
+   "platform": "soundcloud",
+   "slug": "africa-vs-future-community",
+   "title": "Africa vs Future Community Podcast - 001",
+   "url": "https://soundcloud.com/africa-vs-the-future-podcast/africa-vs-future-community",
+   "published": "2026-04-13T09:56:18.000Z",
+   "duration": "00:12:42",
+   "audio": "https://feeds.soundcloud.com/stream/2301606008-africa-vs-the-future-podcast-africa-vs-future-community.mp3",
+   "excerpt": "Explore the importance of language in driving technological advancements in Africa. Learn why embracing English is crucial for the continent's future.",
+   "image": "episode-africa-vs-future-community.jpg",
+   "imageSrc": "https://i1.sndcdn.com/artworks-iN3oLimeUXL5svGb-PmBqyA-t3000x3000.png"
+  }
+ ]
+}

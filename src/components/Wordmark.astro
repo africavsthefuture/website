@@ -1,0 +1,22 @@
+---
+import { Image } from "astro:assets";
+import community from "../assets/brand/community.png";
+interface Props { size?: "md" | "lg"; showMark?: boolean; }
+const { size = "md", showMark = true } = Astro.props;
+const markSize = size === "lg" ? 48 : 36;
+---
+<span class={`brand-lockup brand-lockup-${size}`}>
+  {showMark && (
+    <Image
+      src={community}
+      width={markSize}
+      height={markSize}
+      densities={[1, 2]}
+      alt=""
+      class:list={["brand-mark", { lg: size === "lg" }]}
+      loading="eager"
+      fetchpriority="high"
+    />
+  )}
+  <span class={`wordmark wordmark-${size}`}>AFRICA <span class="vs">VS</span> THE FUTURE</span>
+</span>

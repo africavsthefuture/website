@@ -1,0 +1,32 @@
+{
+  "name": "avtf-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "fetch": "node scripts/fetch-data.mjs",
+    "dev": "astro dev",
+    "build": "node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build",
+    "build:offline": "OFFLINE=1 node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build",
+    "preview": "astro preview --port 4321 --host 127.0.0.1",
+    "build:ads": "esbuild src/scripts/ads.ts --format=iife --target=es2019 --minify --outfile=public/js/ads.js",
+    "shots": "python3 scripts/screenshots.py"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/outfit": "^5.3.0",
+    "astro": "^5.18.2",
+    "fast-xml-parser": "^5.11.2",
+    "gsap": "^3.15.0",
+    "sanitize-html": "^2.17.5",
+    "sharp": "^0.35.5",
+    "simple-icons": "^16.35.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^4.3.3"
+  }
+}

@@ -1,0 +1,54 @@
+---
+import { Picture } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import SubscribeForm from "../../components/SubscribeForm.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { episodes, show, products, img, coverImg, fmtDate } from "../../lib/content";
+import { site, utm } from "../../site.config.mjs";
+const sc = site.channels.find((c) => c.id === "soundcloud")!;
+const tl = products.filter((p) => p.kind === "podcast");
+const toIsoDur = (d?: string | null) => { if (!d) return undefined; const [h, m, s] = d.split(":").map(Number); return `PT${h ? h + "H" : ""}${m ? m + "M" : ""}${s ? s + "S" : ""}`; };
+const ld = [{
+  "@context": "https://schema.org", "@type": "PodcastSeries", name: "Africa vs The Future Community Podcast", url: `${site.url}/podcast`,
+  webFeed: site.feeds.soundcloud, sameAs: [sc.url], publisher: { "@id": `${site.url}/#org` },
+  ...(show?.description ? { description: show.description } : {}),
+  hasPart: episodes.map((e) => ({
+    "@type": "PodcastEpisode", name: e.title, url: e.url, datePublished: e.published, description: e.excerpt,
+    ...(toIsoDur(e.duration) ? { timeRequired: toIsoDur(e.duration) } : {}),
+    ...(e.audio ? { associatedMedia: { "@type": "MediaObject", contentUrl: e.audio } } : {}),
+  })),
+}];
+---
+<Base title="Podcast: Africa vs The Future" description={`The free Africa vs The Future Community podcast on SoundCloud${products.some((p) => p.kind === "podcast") ? ", plus paid Thought Leaders deep-dive episodes" : ""}.`} jsonld={ld}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow">Podcast</p>
+      <h1>Hear the argument out loud.</h1>
+      <p class="lede">Free Community episodes on SoundCloud.{tl.length > 0 && " Paid deep-dives in the Thought Leaders series."}</p>
+      <p><a class="btn btn-gold" href={utm(sc.url, "listen", "podcast_head")} rel="noopener">Follow on SoundCloud ↗</a></p>
+    </header>
+    <section aria-labelledby="free-eps">
+      <h2 id="free-eps" class="section-title" style="font-size:2rem;margin-bottom:1rem">Community episodes · free</h2>
+      <div class="grid" style="gap:1rem">
+        {episodes.map((e) => (
+          <article class="episode">
+            <div class="card-media"><Picture src={img(e.image) ?? coverImg(`episode-${e.slug}`)!} formats={["avif"]} fallbackFormat="webp" widths={[160, 320]} sizes="160px" alt="Generated podcast cover: abstract gold signal motif" loading="lazy" /></div>
+            <div>
+              <p class="meta"><time datetime={e.published}>{fmtDate(e.published)}</time>{e.duration && ` · ${e.duration}`}</p>
+              <h3 class="card-title">{e.title}</h3>
+              <p class="card-sub">{e.excerpt}</p>
+              {e.audio && <audio controls preload="none" src={e.audio}></audio>}
+              <p class="meta" style="margin-top:.5rem"><a class="text-link" href={utm(e.url, "listen", "podcast_episode")} rel="noopener">Open on SoundCloud ↗</a></p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+    {tl.length > 0 && (
+    <section class="section" aria-labelledby="tl-eps">
+      <h2 id="tl-eps" class="section-title" style="font-size:2rem;margin-bottom:1rem">Thought Leaders deep-dives · paid</h2>
+      <div class="grid grid-4">{tl.map((p) => <ProductCard p={p} />)}</div>
+    </section>)}
+    <section class="section"><div class="band"><div><h2>New episodes by email.</h2><p>The free Substack brief announces every release.</p></div><SubscribeForm placement="podcast" /></div></section>
+  </div>
+</Base>

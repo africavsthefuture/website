@@ -1,0 +1,56 @@
+/* Direction A — Intelligence Briefing. Single source of colour/type tokens. */
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette as OKLCH (measured from art, then tuned for WCAG AA on dark) */
+  --color-ground: oklch(0.18 0.02 230);       /* #0F1923 */
+  --color-panel: oklch(0.20 0.015 220);        /* #141A1C */
+  --color-panel-2: oklch(0.24 0.018 210);      /* raised panel */
+  --color-teal: oklch(0.48 0.07 180);          /* #2A7266 */
+  --color-teal-lit: oklch(0.58 0.08 175);      /* hover / lit */
+  --color-teal-text: oklch(0.60 0.08 175);     /* #3F8E7C — AA normal on ground */
+  --color-gold: oklch(0.74 0.13 75);           /* #E09D3E CTA */
+  --color-gold-bright: oklch(0.80 0.13 85);    /* #EAAE42 hover */
+  --color-red: oklch(0.50 0.14 30);            /* #B13E2E live accent */
+  --color-paper: oklch(0.95 0.02 95);          /* #F5EFE2 */
+  --color-muted: oklch(0.72 0.02 180);         /* #A8B0AE — AA on ground */
+  --color-line: oklch(0.95 0.02 95 / 0.12);
+  --color-line-strong: oklch(0.95 0.02 95 / 0.22);
+
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --shadow-panel: 0 24px 80px oklch(0 0 0 / 0.35);
+  --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
+  --container: 1180px;
+}
+
+:root {
+  /* Legacy aliases used across components */
+  --ground: var(--color-ground);
+  --ink: var(--color-ground);
+  --panel: var(--color-panel);
+  --panel-2: var(--color-panel-2);
+  --teal: var(--color-teal);
+  --teal-lit: var(--color-teal-lit);
+  --teal-text: var(--color-teal-text);
+  --gold: var(--color-gold);
+  --gold-bright: var(--color-gold-bright);
+  --red: var(--color-red);
+  --paper: var(--color-paper);
+  --cream: var(--color-paper);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --line-strong: var(--color-line-strong);
+  --font-heading: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --ease: 0.35s var(--ease-brand);
+  --container: 1180px;
+}

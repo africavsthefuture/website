@@ -1,0 +1,17 @@
+---
+// Store routes, all behind site.features.store. When the flag is off, no
+// /store pages are generated at all (so nothing is linked or listed).
+import StoreIndex from "../../components/StoreIndex.astro";
+import ProductPage from "../../components/ProductPage.astro";
+import { products, productPath } from "../../lib/content";
+import { site } from "../../site.config.mjs";
+export function getStaticPaths() {
+  if (!site.features.store) return [];
+  return [
+    { params: { path: undefined }, props: { p: null } },
+    ...products.map((p) => ({ params: { path: productPath(p).replace(/^\/store\//, "") }, props: { p } })),
+  ];
+}
+const { p } = Astro.props as any;
+---
+{p ? <ProductPage p={p} /> : <StoreIndex />}

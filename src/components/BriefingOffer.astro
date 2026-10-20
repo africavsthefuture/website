@@ -1,0 +1,36 @@
+---
+// Lead magnet offer. Contents are not published yet, so this shows only the
+// title, subtitle and status supplied by the brief. Never list the 5 challenges here
+// until the guide exists.
+import SubscribeForm from "./SubscribeForm.astro";
+import { site } from "../site.config.mjs";
+const { variant = "full", placement = "briefing", headingLevel = 2, id } = Astro.props;
+const b = site.briefing;
+const live = b.status === "live";
+const H = `h${headingLevel}`;
+const status = live ? "Free guide" : "Coming soon";
+---
+{variant === "compact" ? (
+  <a class="brief-mini" href={b.path}>
+    <span class="brief-stamp">{status}</span>
+    <b>{b.title}</b>
+    <span>{b.subtitle}.</span>
+    <span class="brief-mini-cta">{live ? "Get it free →" : "Get it free when you subscribe →"}</span>
+  </a>
+) : (
+  <div class="brief-offer">
+    <div class="brief-doc" aria-hidden="true">
+      <div class="brief-doc-top"><span>AvtF</span><span>Briefing</span></div>
+      <p class="brief-doc-title">The Hidden<br />Architecture</p>
+      <ol class="brief-doc-slots">{["01", "02", "03", "04", "05"].map((n) => <li><span>{n}</span><i></i></li>)}</ol>
+      <div class="brief-doc-foot"><span>Africa vs The Future</span><span class="brief-stamp">{status}</span></div>
+    </div>
+    <div class="brief-copy">
+      <p class="kicker">{live ? "Free guide" : "Free guide · coming soon"}</p>
+      <H class="brief-title" id={id}>{b.title}</H>
+      <p class="brief-sub">{b.subtitle}.</p>
+      <p class="brief-body">A free guide built from our published essays. {live ? "Subscribe and it lands in your inbox." : "It's being prepared now. Subscribe free and you'll get it the day it's released."}</p>
+      <SubscribeForm placement={placement} id={`email-${placement}`} cta={live ? "Get the free Briefing" : "Subscribe free"} note={live ? site.signupNote : `${site.signupNote} The Briefing is sent to subscribers when it's released.`} />
+    </div>
+  </div>
+)}

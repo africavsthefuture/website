@@ -1,0 +1,46 @@
+---
+// Shared product detail page. Prices come straight from Gumroad data.
+import { Picture } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import SubscribeForm from "./SubscribeForm.astro";
+import ProductCard from "./ProductCard.astro";
+import { img, coverImg, price, displayName, usableDescription, products, productPath, type Product } from "../lib/content";
+import { site, utm } from "../site.config.mjs";
+const { p } = Astro.props as { p: Product };
+const i = img(p.image) ?? coverImg(`product-${p.slug}`);
+const name = displayName(p);
+const desc = usableDescription(p);
+const buy = utm(p.url, "store", `buy_${p.slug}`);
+const typeLabel = p.kind === "mini-book" ? "Mini-book" : p.kind === "podcast" ? "Podcast deep-dive" : "Series bundle";
+const offer = { "@type": "Offer", price: (p.price_cents / 100).toFixed(2), priceCurrency: p.currency, url: p.url, availability: "https://schema.org/InStock", seller: { "@id": `${site.url}/#org` } };
+const ld: any[] = [{
+  "@context": "https://schema.org", "@type": p.kind === "mini-book" ? ["Product", "Book"] : "Product",
+  name: p.name, url: `${site.url}${productPath(p)}`, sku: p.permalink, brand: { "@type": "Brand", name: site.name },
+  ...(desc ? { description: desc } : { description: `${typeLabel} from the Africa vs The Future Thought Leaders Series.` }),
+  ...(p.thumbnail ? { image: p.thumbnail } : {}),
+  ...(p.kind === "mini-book" ? { bookFormat: "https://schema.org/EBook", author: { "@id": `${site.url}/#org` }, isPartOf: { "@type": "BookSeries", name: "Africa vs The Future: Thought Leaders Series" }, position: p.issue } : {}),
+  offers: offer,
+}, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+  { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+  { "@type": "ListItem", position: 2, name: "Store", item: `${site.url}/store` },
+  { "@type": "ListItem", position: 3, name } ] }];
+const others = products.filter((x) => x.id !== p.id && x.kind === p.kind).slice(0, 4);
+---
+<Base title={`${name}: Thought Leaders Series`} description={desc ? desc.slice(0, 150) : `${typeLabel} in the Africa vs The Future Thought Leaders Series. ${price(p.price_cents, p.currency)} on Gumroad.`} type="product" image={p.thumbnail} jsonld={ld}>
+  <div class="wrap" style="padding-top:2rem">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/store">Store</a> / <span>{name}</span></nav>
+    <div class="product-grid">
+      <div class="product-cover">{i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[320, 420, 840]} sizes="(min-width: 900px) 420px, 90vw" alt={`Generated cover for ${name}`} loading="eager" fetchpriority="high" /> : <div class="card-media-fallback">VS</div>}</div>
+      <div>
+        <p class="eyebrow">{typeLabel} · Thought Leaders Series</p>
+        <h1 style="font-size:clamp(2.2rem,5vw,3.8rem)">{name}</h1>
+        <p class="meta" style="margin-bottom:1rem">Listed on Gumroad as “{p.name}”</p>
+        {desc && <p class="lede">{desc}</p>}
+        <p class="price" style="font-size:2rem;margin:1rem 0">{price(p.price_cents, p.currency)}</p>
+        <p><a class="btn btn-gold" href={buy} rel="noopener">Buy on Gumroad ↗</a></p>
+        <div style="margin-top:2.5rem"><SubscribeForm placement={`product_${p.slug}`} heading="Not ready to buy? Get the free brief." /></div>
+      </div>
+    </div>
+    {others.length > 0 && <section class="section"><h2 class="section-title" style="font-size:2rem;margin-bottom:1rem">More in the series</h2><div class="grid grid-4">{others.map((o) => <ProductCard p={o} />)}</div></section>}
+  </div>
+</Base>

@@ -1,0 +1,87 @@
+---
+import { Picture } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import SubscribeForm from "../../components/SubscribeForm.astro";
+import BriefingOffer from "../../components/BriefingOffer.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import KeyFacts from "../../components/KeyFacts.astro";
+import { articles, img, coverImg, fmtDate, platformLabel, type Article } from "../../lib/content";
+import { topicOf } from "../../lib/cover.mjs";
+import { site, utm } from "../../site.config.mjs";
+
+export function getStaticPaths() {
+  return articles.map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+const { a } = Astro.props as { a: Article };
+const remote = img(a.image);
+const i = remote ?? coverImg(`article-${a.slug}`);
+const topic = topicOf(`${a.title} ${a.tags.join(" ")}`).label;
+const ogImage = `/og/articles/${a.slug}.jpg`;
+const pageUrl = `${site.url}/articles/${a.slug}`;
+const original = utm(a.url, "also_on", a.slug);
+const related = articles.filter((x) => x.slug !== a.slug).slice(0, 3);
+const hasBody = !!(a.body && a.body.length > 200);
+const mins = a.words ? Math.max(1, Math.round(a.words / 230)) : null;
+const desc = (a.subtitle || a.excerpt).slice(0, 155).replace(/\s\S*$/, "") + "…";
+const ld = [
+  {
+    "@context": "https://schema.org", "@type": "Article", "@id": `${pageUrl}#article`, headline: a.title, description: a.subtitle || a.excerpt,
+    datePublished: a.published, ...(a.updated ? { dateModified: a.updated } : {}),
+    author: { "@type": "Organization", name: a.author, url: site.url },
+    publisher: { "@id": `${site.url}/#org` },
+    url: pageUrl, mainEntityOfPage: pageUrl, sameAs: [a.url], isAccessibleForFree: true,
+    ...(a.words ? { wordCount: a.words } : {}), inLanguage: site.lang,
+    image: `${site.url}${ogImage}`, about: topic, ...(a.tags.length ? { keywords: a.tags.join(", ") } : {}),
+  },
+  { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+    { "@type": "ListItem", position: 2, name: "Articles", item: `${site.url}/articles` },
+    { "@type": "ListItem", position: 3, name: a.title, item: pageUrl } ] },
+];
+const facts = [
+  { k: "Published", v: fmtDate(a.published) },
+  ...(mins ? [{ k: "Reading time", v: `${mins} min` }] : []),
+  ...(a.tags.length ? [{ k: "Topics", v: a.tags.join(", ") }] : [{ k: "Topic", v: topic }]),
+  { k: "Also on", v: `<a href="${original}">${platformLabel(a.platform)} ↗</a>` },
+];
+---
+<!-- Canonical is this page: the site is the home of every essay. Medium/Substack copies should point their canonical here. -->
+<Base title={a.title} description={desc} canonical={pageUrl} type="article" image={ogImage} published={a.published} modified={a.updated ?? undefined} jsonld={ld}>
+  <div class="wrap" style="padding-top:2rem">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles">Articles</a> / <span>{topic}</span></nav>
+    <div class="summary-grid">
+      <article class="essay">
+        <p class="eyebrow">{topic} · Essay{mins && ` · ${mins} min read`}</p>
+        <h1 class="essay-title">{a.title}</h1>
+        {a.subtitle && <p class="lede">{a.subtitle}</p>}
+        <p class="byline"><span>By <strong>{a.author}</strong></span><span>Published <time datetime={a.published}><strong>{fmtDate(a.published)}</strong></time></span>{a.updated && <span>Updated <time datetime={a.updated}>{fmtDate(a.updated)}</time></span>}</p>
+        {i && <div class="summary-hero"><Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[480, 800, 1200]} sizes="(min-width: 1000px) 60vw, 100vw" alt={remote ? `Cover image for “${a.title}”` : `Abstract teal-and-gold ${topic.toLowerCase()} motif`} loading="eager" fetchpriority="high" /></div>}
+        {hasBody ? (
+          <div class="prose essay-body" set:html={a.body} />
+        ) : (
+          <div class="prose essay-body"><p>{a.excerpt}</p></div>
+        )}
+        <p class="also-on">Also on <a href={original} rel="noopener">{platformLabel(a.platform)} ↗</a>{!hasBody && " (full text)"}</p>
+        <AdSlot kind="inline" id="article-inline-1" />
+        <div class="band essay-signup" id="signup">
+          <div>
+            <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Enjoyed this?</p>
+            <h2>Get the next essay by email.</h2>
+            <p>Free, from {site.name}. Plus {site.briefing.title} when it's released.</p>
+          </div>
+          <SubscribeForm placement={`article_${a.slug}`.slice(0, 60)} id="email-article" />
+        </div>
+      </article>
+      <aside>
+        <KeyFacts facts={facts} title="About this essay" />
+        <BriefingOffer variant="compact" />
+        <AdSlot kind="rail" id="article-rail-1" />
+      </aside>
+    </div>
+    <section class="section" aria-labelledby="more-title">
+      <h2 id="more-title" class="section-title" style="margin-bottom:1.5rem">More essays</h2>
+      <div class="grid grid-3">{related.map((r) => <ArticleCard a={r} />)}</div>
+    </section>
+  </div>
+</Base>

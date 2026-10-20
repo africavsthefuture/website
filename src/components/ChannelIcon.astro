@@ -1,0 +1,43 @@
+---
+/**
+ * Official platform marks via Simple Icons (bundled SVG path).
+ * Rendered monochrome (currentColor) so we follow common dark-UI usage
+ * without claiming trademark colour fills. SoundCloud etc. brand colour
+ * is intentionally not forced — see each platform's guidelines.
+ */
+import {
+  siSubstack, siMedium, siSoundcloud, siBluesky, siMastodon,
+  siYoutube, siInstagram, siX, siTiktok, siGumroad,
+} from "simple-icons";
+
+const icons: Record<string, { title: string; path: string; hex: string }> = {
+  substack: siSubstack,
+  medium: siMedium,
+  soundcloud: siSoundcloud,
+  bluesky: siBluesky,
+  mastodon: siMastodon,
+  youtube: siYoutube,
+  instagram: siInstagram,
+  x: siX,
+  tiktok: siTiktok,
+  gumroad: siGumroad,
+};
+
+interface Props { id: string; size?: number; class?: string; }
+const { id, size = 16, class: className = "" } = Astro.props;
+const icon = icons[id];
+---
+{icon && (
+  <svg
+    class={className}
+    role="img"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <title>{icon.title}</title>
+    <path d={icon.path} />
+  </svg>
+)}

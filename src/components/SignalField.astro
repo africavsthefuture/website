@@ -1,0 +1,40 @@
+---
+// Abstract, lightweight generative hero visual: orbit rings, a travelling
+// signal wave and data nodes on a fine grid. Inline SVG (a few KB), no image
+// request, so it never becomes the LCP element. CSS animation is disabled
+// under prefers-reduced-motion.
+const W = 900, H = 900;
+let h = 2463534242;
+const r = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
+const f = (n: number) => Math.round(n);
+const cx = 470, cy = 430;
+const rings = [150, 230, 315, 400];
+const nodes = Array.from({ length: 26 }, (_, i) => {
+  const ring = rings[i % rings.length], a = r() * Math.PI * 2;
+  return { x: f(cx + Math.cos(a) * ring), y: f(cy + Math.sin(a) * ring * 0.42), hot: i % 7 === 0 };
+});
+let wave = `M0 ${cy}`;
+for (let x = 0; x <= W; x += 18) {
+  const env = Math.exp(-Math.pow((x - cx) / 230, 2));
+  wave += ` L${x} ${f(cy + Math.sin(x / 26) * 120 * env + Math.sin(x / 9) * 14 * env)}`;
+}
+const bars = Array.from({ length: 18 }, (_, i) => ({ x: 120 + i * 38, h: f(20 + r() * 110 * Math.sin((i / 17) * Math.PI)) }));
+---
+<svg class="signal-field" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="sf-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#f5efe2" stroke-opacity=".06" /></pattern>
+    <radialGradient id="sf-glow" cx="52%" cy="48%" r="50%"><stop offset="0" stop-color="#E09D3E" stop-opacity=".22" /><stop offset="1" stop-color="#E09D3E" stop-opacity="0" /></radialGradient>
+    <linearGradient id="sf-fade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0a0a0a" stop-opacity="0" /><stop offset=".8" stop-color="#0a0a0a" stop-opacity="0" /><stop offset="1" stop-color="#0a0a0a" stop-opacity="1" /></linearGradient>
+  </defs>
+  <rect width={W} height={H} fill="url(#sf-grid)" />
+  <circle cx={cx} cy={cy} r="420" fill="url(#sf-glow)" />
+  <g class="sf-orbits">
+    {rings.map((R, i) => <ellipse cx={cx} cy={cy} rx={R} ry={f(R * 0.42)} fill="none" stroke={i === 2 ? "#E09D3E" : "#f5efe2"} stroke-opacity={i === 2 ? 0.85 : 0.16} stroke-width={i === 2 ? 2 : 1} stroke-dasharray={i === 1 ? "4 10" : undefined} transform={`rotate(-14 ${cx} ${cy})`} />)}
+    {nodes.map((n) => <rect x={n.x - (n.hot ? 6 : 3)} y={n.y - (n.hot ? 6 : 3)} width={n.hot ? 12 : 6} height={n.hot ? 12 : 6} fill={n.hot ? "#E09D3E" : "#f5efe2"} fill-opacity={n.hot ? 1 : 0.55} class={n.hot ? "sf-hot" : undefined} transform={`rotate(-14 ${cx} ${cy})`} />)}
+  </g>
+  <g opacity=".5">{bars.map((b) => <rect x={b.x} y={760 - b.h} width="16" height={b.h} fill="#f5efe2" fill-opacity=".1" />)}</g>
+  <line x1="0" y1="760" x2={W} y2="760" stroke="#f5efe2" stroke-opacity=".18" />
+  <path class="sf-wave-base" d={wave} fill="none" stroke="#f5efe2" stroke-opacity=".18" stroke-width="1.5" />
+  <path class="sf-wave" d={wave} fill="none" stroke="#E09D3E" stroke-width="3" stroke-linecap="round" pathLength="1000" />
+  <rect width={W} height={H} fill="url(#sf-fade)" />
+</svg>

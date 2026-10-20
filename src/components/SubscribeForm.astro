@@ -1,0 +1,20 @@
+---
+// Native, JS-free Substack signup. Posts to Substack's public free-signup
+// endpoint in a new tab. TODO(VERIFY): test one real signup before launch.
+import { site } from "../site.config.mjs";
+const { placement = "inline", heading, compact = false, id, note, cta = "Subscribe free" } = Astro.props;
+const fid = id ?? `email-${placement}`;
+---
+<form class:list={["subscribe", { compact }]} action={site.substack.formAction} method="post" target="_blank" data-subscribe={placement}>
+  {heading && <p class="subscribe-heading">{heading}</p>}
+  <div class="subscribe-row">
+    <label class="sr-only" for={fid}>Email address</label>
+    <input id={fid} type="email" name="email" required autocomplete="email" placeholder="you@example.com" inputmode="email" />
+    <input type="hidden" name="first_url" value={`${site.url}/`} data-first-url />
+    <input type="hidden" name="first_referrer" value="" data-first-ref />
+    <input type="hidden" name="current_url" value={`${site.url}/`} data-current-url />
+    <input type="hidden" name="source" value={`avtf_site_${placement}`} />
+    <button class="btn btn-gold" type="submit">{cta}</button>
+  </div>
+  <p class="subscribe-small">{note ?? site.signupNote}</p>
+</form>

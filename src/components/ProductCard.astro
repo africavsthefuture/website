@@ -1,0 +1,19 @@
+---
+import { Picture } from "astro:assets";
+import { img, coverImg, price, productPath, displayName, type Product } from "../lib/content";
+const { p } = Astro.props as { p: Product };
+const i = img(p.image) ?? coverImg(`product-${p.slug}`);
+---
+<article class="card product-card">
+  <a href={productPath(p)} class="card-link">
+    <div class="card-media square">
+      {i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[300, 500]} sizes="(min-width: 900px) 22vw, 50vw" alt={`Generated cover for ${displayName(p)}, Africa vs The Future Thought Leaders`} loading="lazy" />
+         : <div class="card-media-fallback" aria-hidden="true">VS</div>}
+      <span class="chip chip-gold">{p.kind === "mini-book" ? "Mini-book" : p.kind === "podcast" ? "Podcast" : "Bundle"}</span>
+    </div>
+    <div class="card-body">
+      <h3 class="card-title">{displayName(p)}</h3>
+      <p class="price">{price(p.price_cents, p.currency)}</p>
+    </div>
+  </a>
+</article>

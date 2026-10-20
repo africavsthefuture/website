@@ -1,0 +1,261 @@
+---
+import { Picture, Image, getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import SubscribeForm from "../components/SubscribeForm.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import ProductCard from "../components/ProductCard.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Faq from "../components/Faq.astro";
+import KeyFacts from "../components/KeyFacts.astro";
+import BriefingOffer from "../components/BriefingOffer.astro";
+import ChannelIcon from "../components/ChannelIcon.astro";
+import { site, utm, liveChannels } from "../site.config.mjs";
+import { articles, episodes, posts, products, img, coverImg, price, fmtDate } from "../lib/content";
+import { topicOf } from "../lib/cover.mjs";
+import { faq, faqJsonLd } from "../lib/faq";
+import community from "../assets/brand/community-hero.jpg";
+import tlPortrait from "../assets/brand/tl-portrait.jpg";
+
+const [lead, ...rest] = articles;
+const side = rest.slice(0, 2), more = rest.slice(2, 5);
+const storeOn = site.features.store;
+const tlPods = products.filter((p) => p.kind === "podcast");
+const bundle = products.find((p) => p.kind === "bundle");
+const storeItems = products.slice(0, 4);
+const ep = episodes[0];
+const topicFor = (a: any) => topicOf(`${a.title} ${(a.tags || []).join(" ")}`).label;
+const topics = [...new Set(articles.map(topicFor))].slice(0, 5);
+const now = articles.slice(0, 4);
+const tickerItems = [...articles.map((a) => ({ t: a.title, h: `/articles/${a.slug}` })), ...episodes.map((e) => ({ t: e.title, h: "/podcast" }))];
+const ch = Object.fromEntries(site.channels.map((c) => [c.id, c]));
+const facts = [
+  { k: "What", v: "Essays and podcasts on the hard questions facing Africa's nations" },
+  { k: "Topics", v: topics.join(" · ") },
+  { k: "Read free", v: `<a href="/articles">Every essay, in full, on this site</a> (also on Medium and Substack)` },
+  { k: "Listen free", v: `<a href="${utm(ch.soundcloud.url, "keyfacts")}">SoundCloud</a> Community podcast` },
+  { k: "Latest essay", v: `<a href="/articles/${lead.slug}">${lead.title}</a> (${fmtDate(lead.published)})` },
+];
+const channelBlurb: Record<string, string> = {
+  substack: "Free brief by email", medium: "Free essays", soundcloud: "Community podcast", youtube: "Video",
+  bluesky: "Daily posts", mastodon: "Daily posts", x: "Daily posts", instagram: "Visual posts", tiktok: "Short video", gumroad: "Thought Leaders store",
+};
+const epCover = ep ? (img(ep.image) ?? coverImg(`episode-${ep.slug}`)) : undefined;
+const heroTopic = topics[0] || "Signal";
+// Hero art: built by hand so the <link rel=preload> srcset matches the <picture> exactly.
+const heroW = [480, 820, 1000];
+const heroAvif = await Promise.all(heroW.map((w) => getImage({ src: community, width: w, format: "avif", quality: 55 })));
+const heroWebp = await Promise.all(heroW.map((w) => getImage({ src: community, width: w, format: "webp", quality: 70 })));
+const srcset = (arr: any[]) => arr.map((r, i) => `${r.src} ${heroW[i]}w`).join(", ");
+const heroSizes = "(min-width: 900px) 58vw, 100vw";
+const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcloud", "bluesky", "youtube", "x", "mastodon"].includes(c.id));
+---
+<Base title={`${site.name}: ${site.tagline}`} description={site.description} jsonld={[faqJsonLd]}>
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={srcset(heroAvif)} imagesizes={heroSizes} fetchpriority="high" />
+  <section class="hero-brief has-art">
+    <div class="hero-art">
+      <picture>
+        <source type="image/avif" srcset={srcset(heroAvif)} sizes={heroSizes} />
+        <img src={heroWebp[1].src} srcset={srcset(heroWebp)} sizes={heroSizes} width="1000" height="1000" alt="The Africa vs The Future Community portrait: a woman in profile, her head drawn as circuitry" loading="eager" fetchpriority="high" decoding="async" />
+      </picture>
+      <p class="hero-art-cap" aria-hidden="true"><span>Fig. 01</span> Community</p>
+    </div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <div class="hero-kicker">
+          <p class="kicker">Africa vs The Future</p>
+          <span class="live-dot" aria-hidden="true"></span>
+        </div>
+        <ul class="topic-rail" aria-label="Topics we cover">{topics.map((t) => <li>{t}</li>)}</ul>
+        <h1 data-split-h1>African ownership of narrative <span class="gold">next</span>.</h1>
+        <p class="lede">{site.supportLine}</p>
+        <SubscribeForm placement="hero" id="email-hero" cta={site.briefing.status === "live" ? "Get the free Briefing" : "Subscribe free"} />
+        <p class="hero-alt"><a href={site.briefing.path}><span class="brief-stamp">{site.briefing.status === "live" ? "Free" : "Soon"}</span> {site.briefing.title}: get it free when you subscribe →</a></p>
+        <div class="platform-row" aria-label="Channels">
+          <span class="label">Follow</span>
+          {platformRow.map((c) => (
+            <a class="channel-badge" href={utm(c.url, "channels", "hero_row")} rel={c.rel === "me" ? "me noopener" : "noopener"}>
+              <ChannelIcon id={c.id} size={14} />{c.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="now-strip" aria-labelledby="now-title">
+    <div class="wrap now">
+        <div class="now-head">
+          <p class="kicker" id="now-title">Now arguing</p>
+          <span class="live-dot" aria-hidden="true"></span>
+        </div>
+        <ol>
+          {now.map((a) => (
+            <li>
+              <a href={`/articles/${a.slug}`}>
+                <b>{a.title}</b>
+                <small>{topicFor(a)} · <time datetime={a.published}>{fmtDate(a.published)}</time></small>
+              </a>
+            </li>
+          ))}
+        </ol>
+    </div>
+  </section>
+
+  <div class="ticker" aria-label="Latest releases">
+    <div class="ticker-inner">
+      {[...tickerItems, ...tickerItems].map((i, n) => (
+        <span aria-hidden={n >= tickerItems.length ? "true" : undefined}>
+          <a href={i.h} tabindex={n >= tickerItems.length ? -1 : undefined}>{i.t}</a>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <section class="section" aria-labelledby="latest-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div><span class="section-num">01 / Read</span><h2 id="latest-title" class="section-title">Latest essays</h2></div>
+        <a class="text-link" href="/articles">All articles →</a>
+      </div>
+      <div class="feature-grid">
+        <ArticleCard a={lead} big />
+        <div class="stack">{side.map((a) => <ArticleCard a={a} />)}</div>
+      </div>
+      {more.length > 0 && <div class="grid grid-3" style="margin-top:1.25rem">{more.map((a) => <ArticleCard a={a} />)}</div>}
+      <AdSlot kind="inline" id="home-inline-1" />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="briefing-home">
+    <div class="wrap">
+      <span class="section-num">02 / Free guide</span>
+      <BriefingOffer placement="briefing_home" id="briefing-home" />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tiers-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-num">03 / Choose your depth</span>
+          <h2 id="tiers-title" class="section-title">Free Community <span style="color:var(--gold)">vs</span> Thought Leaders</h2>
+        </div>
+      </div>
+      <div class="tiers">
+        <div class="tier">
+          <div class="tier-art"><Picture src={community} formats={["avif"]} fallbackFormat="webp" widths={[400, 640]} sizes="(min-width: 800px) 40vw, 100vw" alt="Community portrait" loading="lazy" /><span class="tier-tag">Free</span></div>
+          <p class="kicker">Free · Community</p>
+          <h3>Start with the argument.</h3>
+          <ul>
+            <li><div><b>Every essay, in full</b><span>Free to read on this site, also on Medium and Substack</span></div></li>
+            <li><div><b>Email sign-up</b><span>New essays and episodes in your inbox</span></div></li>
+            <li><div><b>SoundCloud Community podcast</b><span>{episodes.length} episode{episodes.length === 1 ? "" : "s"} so far</span></div></li>
+          </ul>
+          <div class="btns">
+            <a class="btn btn-gold" href="#email-band">Subscribe free</a>
+          </div>
+        </div>
+        <div class="tier-vs" aria-hidden="true">VS</div>
+        <div class="tier tl">
+          <div class="tier-art"><Picture src={tlPortrait} formats={["avif"]} fallbackFormat="webp" widths={[400, 640]} sizes="(min-width: 800px) 40vw, 100vw" alt="Thought Leaders portrait: a man in glasses against a city skyline" loading="lazy" /><span class="tier-tag tl">Paid</span></div>
+          <p class="kicker">Paid · Thought Leaders</p>
+          <h3>The deeper analysis.</h3>
+          <ul>
+            <li><div><b>Substack paid edition</b><span>The full analysis behind the free posts</span></div></li>
+            {storeOn && tlPods.length > 0 && <li><div><b>Thought Leaders podcast</b><span>{tlPods.length} deep-dive episode{tlPods.length === 1 ? "" : "s"} on Gumroad</span></div></li>}
+          </ul>
+          <p class="tier-note">An optional paid edition on Substack. Everything in Community stays free.</p>
+          <div class="btns">
+            {storeOn && <a class="btn btn-ghost" href="/store">Browse the store</a>}
+            {storeOn && bundle && <a class="btn btn-ghost" href={`/store/bundles/${bundle.slug}`}>Series bundle · {price(bundle.price_cents, bundle.currency)}</a>}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {ep && (
+  <section class="section" aria-labelledby="listen-title">
+    <div class="wrap two-col">
+      <div>
+        <span class="section-num">04 / Listen</span>
+        <h2 id="listen-title" class="section-title">The podcast</h2>
+        <p class="lede">The free Community podcast on SoundCloud.</p>
+        <a class="text-link" href="/podcast">All episodes →</a>
+      </div>
+      <article class="episode">
+        <div class="card-media">{epCover ? <Picture src={epCover} formats={["avif"]} fallbackFormat="webp" widths={[280, 560]} sizes="(min-width: 560px) 260px, 100vw" alt={img(ep.image) ? `Episode artwork for “${ep.title}”` : `Abstract teal-and-gold cover for “${ep.title}”`} loading="lazy" /> : <div class="card-media-fallback">VS</div>}</div>
+        <div>
+          <p class="meta"><time datetime={ep.published}>{fmtDate(ep.published)}</time>{ep.duration && ` · ${ep.duration}`} · SoundCloud</p>
+          <h3 class="card-title">{ep.title}</h3>
+          <p class="card-sub">{ep.excerpt}</p>
+          {ep.audio && <audio controls preload="none" src={ep.audio}><a href={ep.url}>Listen on SoundCloud</a></audio>}
+          <p style="margin-top:.75rem"><a class="channel-badge" href={utm(ch.soundcloud.url, "listen", "podcast_card")} rel="noopener"><ChannelIcon id="soundcloud" size={14} /> SoundCloud</a></p>
+        </div>
+      </article>
+    </div>
+  </section>)}
+
+  {storeOn && storeItems.length > 0 && (
+  <section class="section" aria-labelledby="store-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div><span class="section-num">Own</span><h2 id="store-title" class="section-title">Latest from the store</h2></div>
+        <a class="text-link" href="/store">All products →</a>
+      </div>
+      <div class="grid grid-4">{storeItems.map((p) => <ProductCard p={p} />)}</div>
+    </div>
+  </section>)}
+
+  <section class="section" aria-labelledby="discussion-title">
+    <div class="wrap two-col">
+      <div>
+        <span class="section-num">05 / Discuss</span>
+        <h2 id="discussion-title" class="section-title">Current discussion</h2>
+        <p class="lede">Recent posts from Bluesky, updated at every build.</p>
+        <div class="posts">
+          {posts.slice(0, 3).map((p) => (
+            <article class="post"><p>{p.text}</p><p class="meta"><time datetime={p.created}>{fmtDate(p.created)}</time> · <a href={utm(p.url, "discussion")} rel="noopener">Join the thread on Bluesky ↗</a></p></article>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p class="kicker">Follow everywhere</p>
+        <div class="channels">
+          {liveChannels().map((c) => (
+            <a class="channel-card" href={utm(c.url, "channels", "home_grid")} rel={c.rel === "me" ? "me noopener" : "noopener"}>
+              <ChannelIcon id={c.id} size={18} />
+              <span><b>{c.label}</b><span>{channelBlurb[c.id]}</span></span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="facts-title">
+    <div class="wrap two-col">
+      <div>
+        <span class="section-num">06 / In brief</span>
+        <h2 id="facts-title" class="section-title">Key facts</h2>
+        <KeyFacts facts={facts} title="Africa vs The Future at a glance" />
+      </div>
+      <Faq items={faq} title="Frequently asked" />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="band-title">
+    <div class="wrap">
+      <div class="band">
+        <div>
+          <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Never miss a release</p>
+          <h2 id="band-title">Get every essay by email.</h2>
+          <p>New essays and episodes as they land, plus {site.briefing.title} when it's released.</p>
+        </div>
+        <div>
+          <SubscribeForm placement="band" id="email-band" />
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

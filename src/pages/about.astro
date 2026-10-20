@@ -1,0 +1,59 @@
+---
+import Base from "../layouts/Base.astro";
+import SubscribeForm from "../components/SubscribeForm.astro";
+import KeyFacts from "../components/KeyFacts.astro";
+import Faq from "../components/Faq.astro";
+import { Picture } from "astro:assets";
+import community from "../assets/brand/community-hero.jpg";
+import tlPortrait from "../assets/brand/tl-portrait.jpg";
+import { faq, faqJsonLd } from "../lib/faq";
+import { site, utm, liveChannels } from "../site.config.mjs";
+// Copy paraphrases media-studio inputs/01_branding/business_description.md.
+const ld = [{ "@context": "https://schema.org", "@type": "AboutPage", name: "About Africa vs The Future", url: `${site.url}/about`, about: { "@id": `${site.url}/#org` } }, faqJsonLd];
+const facts = [
+  { k: "Focus", v: "The hardest, most impactful questions facing the nations of the African continent" },
+  { k: "Audience", v: "Citizens, builders, funders and thinkers across the continent's 55 states" },
+  { k: "Stance", v: "Not Pan-African. Argues for aligned and enlightened self-interest (AESIFAN)" },
+  { k: "Short name", v: "AvtF" },
+  { k: "Formats", v: "Essays (on this site, also on Medium and Substack) · Podcast (SoundCloud)" },
+];
+---
+<Base title="About Africa vs The Future" description={site.welcome} jsonld={ld}>
+  <div class="wrap">
+    <header class="page-head two-col" style="align-items:center">
+      <div>
+        <p class="eyebrow">About</p>
+        <p class="kicker">{site.tagline}</p>
+        <h1>A new voice for hard questions.</h1>
+        <p class="lede">{site.welcome}</p>
+        <p>{site.name} (AvtF) exists to fill a media gap: the fundamental, “hard” questions about the continent's future too often go unasked, by citizens and by the powers that be.</p>
+      </div>
+      <div class="about-diptych">
+        <figure><Picture src={community} formats={["avif"]} fallbackFormat="webp" widths={[320, 560]} sizes="(min-width: 900px) 22vw, 45vw" alt="Community portrait: a woman in profile, her head drawn as circuitry" loading="eager" /><figcaption>Community · free</figcaption></figure>
+        <figure><Picture src={tlPortrait} formats={["avif"]} fallbackFormat="webp" widths={[320, 560]} sizes="(min-width: 900px) 22vw, 45vw" alt="Thought Leaders portrait: a man in glasses against a city skyline" loading="eager" /><figcaption>Thought Leaders · paid</figcaption></figure>
+      </div>
+    </header>
+    <div class="two-col">
+      <div class="prose">
+        <h2>Why</h2>
+        <p>The world is changing fast. Nationalism, identity, self-determination and sovereignty are back at the centre of politics, and the post-war order is being questioned. Africa vs The Future refuses both the platitudes and the victimhood of the past. It looks at the present from a centrist, strategic and tactical point of view.</p>
+        <p>The project looks at the innovations and trends happening in the world today. It asks questions, and tries to inspire them, in the minds of citizens across the continent's 55 states. The goal is tangible, practical action based on self-reliance, clarity and unapologetic ownership.</p>
+        <h2>What we believe</h2>
+        <p>We are <strong>not</strong> Pan-African. We believe in the long, ancient diversity of the continent and in what that diversity brings to a new narrative. In our view, the practical, enduring idea is <em>aligned and enlightened self-interest</em>: aligned goals, aligned purpose and conscious interdependence between nations.</p>
+        <h2>How it works</h2>
+        <ul>
+          <li><strong>Community (free):</strong> every essay in full on this site (also on Medium and Substack), email sign-up, and the Community podcast on SoundCloud.</li>
+          <li><strong>{site.briefing.title} (free, coming soon):</strong> {site.briefing.subtitle}. <a href={site.briefing.path}>Get it free when you subscribe</a>.</li>
+          <li><strong>Thought Leaders (paid):</strong> the Substack paid edition{site.features.store && ", plus podcast deep-dives on Gumroad"}.</li>
+        </ul>
+        <h2>Follow</h2>
+        <p>{liveChannels().map((c, n) => <>{n > 0 && " · "}<a href={utm(c.url, "channels", "about")} rel={c.rel === "me" ? "me noopener" : "noopener"}>{c.label}</a></>)}</p>
+      </div>
+      <div style="display:grid;gap:1.5rem">
+        <KeyFacts facts={facts} />
+        <SubscribeForm placement="about" heading="Get every essay by email" />
+      </div>
+    </div>
+    <div class="section"><Faq items={faq} /></div>
+  </div>
+</Base>

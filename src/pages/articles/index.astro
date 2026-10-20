@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import SubscribeForm from "../../components/SubscribeForm.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { articles } from "../../lib/content";
+import { site, utm } from "../../site.config.mjs";
+const list = {
+  "@context": "https://schema.org", "@type": "CollectionPage", name: "Articles", url: `${site.url}/articles`,
+  mainEntity: { "@type": "ItemList", itemListElement: articles.map((a, i) => ({ "@type": "ListItem", position: i + 1, url: `${site.url}/articles/${a.slug}`, name: a.title })) },
+};
+const [first, ...others] = articles;
+---
+<Base title="Articles: essays on Africa's future" description="Every Africa vs The Future essay, in full: copper, beneficiation, defence, EVs, AI and self-determination. A critical, progressive look at Africa's future." jsonld={[list]}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow">Articles</p>
+      <h1>Essays that pick a side.</h1>
+      <p class="lede">{articles.length} essays newest first, also published on Medium and Substack. Read every one in full here.</p>
+      <SubscribeForm placement="articles_head" />
+    </header>
+    <div class="feature-grid" style="grid-template-columns:1fr">
+      <ArticleCard a={first} big eager />
+    </div>
+    <div class="grid grid-3" style="margin-top:1.25rem">{others.map((a) => <ArticleCard a={a} />)}</div>
+    <AdSlot kind="inline" id="articles-inline-1" />
+  </div>
+</Base>

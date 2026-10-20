@@ -1,0 +1,14 @@
+---
+import Base from "../layouts/Base.astro";
+import SubscribeForm from "../components/SubscribeForm.astro";
+import { articles } from "../lib/content";
+---
+<Base title="Page not found" description="This page doesn't exist." noindex>
+  <div class="wrap notfound">
+    <p class="big404">404</p>
+    <h1>This page lost the argument.</h1>
+    <p class="lede" style="margin-inline:auto">It doesn't exist or has moved. Try the <a class="text-link" href="/articles">articles</a>, the <a class="text-link" href="/podcast">podcast</a> or the <a class="text-link" href="/">home page</a>.</p>
+    {articles[0] && <p>Latest essay: <a class="text-link" href={`/articles/${articles[0].slug}`}>{articles[0].title}</a></p>}
+    <div style="display:flex;justify-content:center;margin-top:2rem"><SubscribeForm placement="404" /></div>
+  </div>
+</Base>

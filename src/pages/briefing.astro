@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+import BriefingOffer from "../components/BriefingOffer.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { articles } from "../lib/content";
+import { site } from "../site.config.mjs";
+const b = site.briefing;
+const ld = [{ "@context": "https://schema.org", "@type": "WebPage", name: b.title, url: `${site.url}${b.path}`, description: `${b.subtitle}. A free guide from ${site.name}.`, isPartOf: { "@id": `${site.url}/#website` }, publisher: { "@id": `${site.url}/#org` } }];
+---
+<Base title={`${b.title}: free guide`} description={`${b.subtitle}. A free guide from ${site.name}, built from our published essays. ${b.status === "live" ? "Get it free" : "Coming soon: get it free"} when you subscribe.`} jsonld={ld}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow">Free guide</p>
+    </header>
+    <BriefingOffer placement="briefing_page" headingLevel={1} id="briefing-title" />
+    <section class="section" aria-labelledby="read-now">
+      <div class="section-head"><div><span class="section-num">While you wait</span><h2 id="read-now" class="section-title">Read the essays now</h2></div><a class="text-link" href="/articles">All articles →</a></div>
+      <div class="grid grid-3">{articles.slice(0, 3).map((a) => <ArticleCard a={a} />)}</div>
+    </section>
+  </div>
+</Base>

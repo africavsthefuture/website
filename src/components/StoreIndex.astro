@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+import ProductCard from "./ProductCard.astro";
+import SubscribeForm from "./SubscribeForm.astro";
+import { products, productPath, price, displayName } from "../lib/content";
+import { site, utm } from "../site.config.mjs";
+const books = products.filter((p) => p.kind === "mini-book");
+const pods = products.filter((p) => p.kind === "podcast");
+const bundles = products.filter((p) => p.kind === "bundle");
+const ld = [{
+  "@context": "https://schema.org", "@type": "CollectionPage", name: "Thought Leaders store", url: `${site.url}/store`,
+  mainEntity: { "@type": "ItemList", itemListElement: products.map((p, i) => ({ "@type": "ListItem", position: i + 1, url: `${site.url}${productPath(p)}`, name: displayName(p) })) },
+}];
+---
+<Base title="Store: Thought Leaders" description="Thought Leaders deep-dives from Africa vs The Future, sold on Gumroad." jsonld={ld}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="eyebrow">Thought Leaders · Store</p>
+      <h1>Own the thinking that owns the future.</h1>
+      <p class="lede">Deep-dives for people who have to be right about Africa's future, not just opinionated about it. Checkout runs on Gumroad.</p>
+      <p><a class="btn btn-ghost" href={utm(site.gumroad.store, "store", "store_head")} rel="noopener">Open the Gumroad store ↗</a></p>
+    </header>
+    {bundles.map((b) => (
+      <section class="band" style="margin-bottom:3rem">
+        <div><p class="eyebrow" style="color:var(--ink)">Series bundle</p><h2>{displayName(b)}</h2><p>{price(b.price_cents, b.currency)} on Gumroad.</p></div>
+        <div><a class="btn btn-gold" href={productPath(b)}>See the bundle →</a></div>
+      </section>
+    ))}
+    {books.length > 0 && <section aria-labelledby="mb"><h2 id="mb" class="section-title" style="font-size:2rem;margin-bottom:1rem">Mini-books</h2><div class="grid grid-4">{books.map((p) => <ProductCard p={p} />)}</div></section>}
+    {pods.length > 0 && <section class="section" aria-labelledby="pd"><h2 id="pd" class="section-title" style="font-size:2rem;margin-bottom:1rem">Podcast deep-dives</h2><div class="grid grid-4">{pods.map((p) => <ProductCard p={p} />)}</div></section>}
+    <section class="section"><div class="two-col"><div><h2 class="section-title" style="font-size:2rem">Not ready to buy?</h2><p class="lede">Get the free brief instead.</p></div><SubscribeForm placement="store" /></div></section>
+  </div>
+</Base>

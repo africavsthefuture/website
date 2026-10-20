@@ -1,0 +1,18 @@
+---
+// Reserved-size ad slot. Space is held with fixed min-height/aspect so filling
+// it later causes no layout shift (CLS-safe). Ads are only requested by
+// /src/scripts/ads.ts when site.ads.enabled is true AND consent allows.
+// Never place one of these above the fold or next to the subscribe CTA.
+import { site } from "../site.config.mjs";
+const { kind = "inline", id } = Astro.props; // "inline" (in-content) | "rail" (desktop sidebar)
+const sizes = { inline: { w: 336, h: 280, mobile: [300, 250] }, rail: { w: 300, h: 600, mobile: null } } as const;
+const s = sizes[kind as keyof typeof sizes];
+const show = site.ads.enabled || (site.ads as any).showPlaceholders;
+---
+{show && (
+  <aside class={`ad-slot ad-${kind}`} data-ad-slot={id} data-ad-kind={kind} data-ad-sizes={JSON.stringify([[s.w, s.h], ...(s.mobile ? [s.mobile] : [])])}
+    style={`--ad-w:${s.w}px;--ad-h:${s.h}px;${s.mobile ? `--ad-mw:${s.mobile[0]}px;--ad-mh:${s.mobile[1]}px;` : ""}`} aria-label="Advertisement">
+    <span class="ad-label">Advertisement</span>
+    <div class="ad-box" id={`ad-${id}`}></div>
+  </aside>
+)}
