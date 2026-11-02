@@ -62,7 +62,7 @@ export const articleSlug = (a: Article) => a.slug;
 
 export const episodes = (soundcloud as any).episodes as any[];
 export const show = (soundcloud as any).show;
-export const videos = youtube as any[];
+export const videos = site.features.youtube ? (youtube as any[]) : [];
 export const posts = bluesky as any[];
 export const buildReport = report as any;
 

@@ -1,6 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
-import { site } from "../site.config.mjs";
+import { site, liveChannels } from "../site.config.mjs";
+const linked = liveChannels().map((c) => c.label);
+const linkList = linked.length > 1 ? `${linked.slice(0, -1).join(", ")} and ${linked.at(-1)}` : linked.join("");
 // TODO(LEGAL): draft only. This describes how THIS build behaves and must be
 // reviewed (UK GDPR / PECR) before launch, especially once ads or analytics are on.
 const updated = "2026-10-19";
@@ -19,7 +21,7 @@ const updated = "2026-10-19";
       <h2>Embedded audio</h2>
       <p>Podcast players stream audio from SoundCloud's servers only when you press play.</p>
       <h2>Links to other platforms</h2>
-      <p>Links to Medium, Substack, SoundCloud, YouTube, Bluesky, X, Instagram{site.features.store ? ", TikTok and Gumroad" : " and TikTok"} include campaign parameters (UTM tags). These tell us which page a visit came from. They contain no personal data.</p>
+      <p>Links to {linkList} include campaign parameters (UTM tags). These tell us which page a visit came from. They contain no personal data.</p>
       <h2>Analytics and advertising</h2>
       <p>None are active today. If we add privacy-friendly analytics or advertising, this page will be updated first. Where the law requires it, we will ask for your consent through a consent banner that follows the IAB Transparency &amp; Consent Framework.</p>
       <h2>Your rights</h2>

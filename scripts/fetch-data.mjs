@@ -311,6 +311,13 @@ const report = {};
 for (const [name, fn] of Object.entries(sources)) {
   const cacheFile = path.join(CACHE, `${name}.json`);
   let data, status;
+  if (name === "youtube" && !site.features?.youtube) {
+    // features.youtube=false: no fetch; ship an empty list and leave the cache untouched.
+    await fs.writeFile(path.join(DATA, `${name}.json`), "[]");
+    report[name] = "skipped (features.youtube=false)";
+    console.log(`[fetch] ${name.padEnd(10)} ${report[name]}`);
+    continue;
+  }
   try {
     if (OFFLINE) throw new Error("OFFLINE=1");
     data = await fn();

@@ -37,7 +37,9 @@ export const site = {
   //        link and store sections. The Gumroad fetch keeps running so the data
   //        is ready when this is switched back on.
   // miniBooks: mini-books are not ready, so they stay hidden even when the store is on.
-  features: { store: false, miniBooks: false },
+  // youtube: no YouTube channel yet (TikTok reels only; no content mirroring). false hides
+  //          the YouTube channel link everywhere (incl. JSON-LD sameAs, llms.txt) and skips the feed fetch.
+  features: { store: false, miniBooks: false, youtube: false },
 
   // Covers: true = use each article's own feed artwork where it passed screening
   // (src/data/image-policy.mjs, with crops applied). Rejected/unscreened images
@@ -68,7 +70,7 @@ export const site = {
     { id: "substack", label: "Substack", url: "https://africavsfuture.substack.com/", tier: "community", verb: "Subscribe free" },
     { id: "medium", label: "Medium", url: "https://medium.com/@africavsfuture", tier: "community", verb: "Follow" },
     { id: "soundcloud", label: "SoundCloud", url: "https://soundcloud.com/africa-vs-the-future-podcast", tier: "community", verb: "Listen" },
-    { id: "youtube", label: "YouTube", url: "https://www.youtube.com/@africavsthefuture", tier: "social", verb: "Watch" },
+    { id: "youtube", label: "YouTube", url: "https://www.youtube.com/@africavsthefuture", tier: "social", verb: "Watch", requires: "youtube" },
     { id: "bluesky", label: "Bluesky", url: "https://bsky.app/profile/africavsthefuture.bsky.social", tier: "social", verb: "Follow" },
     // Mastodon profile (set 19 Oct 2026). Link uses rel="me" for verification;
     // user must also add https://www.africavsthefuture.xyz as a profile website field.

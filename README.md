@@ -19,7 +19,7 @@ npm run build:ads      # rebuild public/js/ads.js from src/scripts/ads.ts
 `scripts/fetch-data.mjs` fetches these sources, each with a 12 s timeout:
 - Medium RSS
 - Substack RSS
-- YouTube channel feed
+- YouTube channel feed (only when `features.youtube` is `true`; skipped otherwise)
 - SoundCloud RSS
 - Bluesky public API
 - Gumroad (public storefront, plus each product page)
@@ -37,6 +37,7 @@ The home hero visual (`src/components/SignalField.astro`) is inline SVG with CSS
 | Flag | Default | Effect |
 |---|---|---|
 | `features.store` | `false` | Controls `/store` and product pages, the Store nav link, the Gumroad channel link, the store/Thought-Leaders product sections, Product/Book JSON-LD, and the Gumroad sections of llms.txt and the privacy page. The Gumroad fetch keeps running, so the data stays ready. |
+| `features.youtube` | `false` | No YouTube channel yet (TikTok reels only, no content mirroring). Hides the YouTube link everywhere (header/hero/footer/home grid/about/privacy, JSON-LD `sameAs`, llms.txt, llms-full.txt) and skips the YouTube feed fetch. |
 | `features.miniBooks` | `false` | Mini-books stay hidden even when the store is on. |
 | `covers.remote` | `false` | `true` uses the downloaded Medium/Substack/SoundCloud artwork instead of the generated covers. |
 
