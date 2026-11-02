@@ -10,7 +10,7 @@ export const imagePolicy = [
   { id: "1*FJPL_RgzQGeWQcROcLwTIA", verdict: "ok", note: "Value addition: mine-to-factory illustration, no map" },
   { id: "1*1rmvCrSTKiUhznBG-oAaZA", verdict: "ok", note: "Ownership: aerospace manufacturing hall, no map" },
   { id: "1*uAf1uHf1oOFNRaYCL3bv_g", verdict: "reject", note: "AESIFAN: central emblem is an Africa continent outline; side panels too narrow to crop to 16:9" },
-  { id: "1*VvIXho96oTr6CED813bBXw", verdict: "ok-crop", crop: [0, 0, 1, 0.94], note: "Goat Herder: crop bottom 6% removes Medium watermark. Flag: rural savanna scene, but it is the essay's literal subject" },
+  { id: "1*VvIXho96oTr6CED813bBXw", verdict: "ok-crop", crop: [0, 0, 1, 0.94], note: "Goat Herder: crop bottom 6% removes Medium watermark. Flag: rural savanna scene, but it is the article's literal subject" },
   { id: "1*bca1egRWVpyBmHODB9g7dw", verdict: "ok", note: "Translation Lag infographic (Goat Herder inline), no map" },
   { id: "!YscF!", verdict: "ok-crop", crop: [0, 0, 0.645, 1], note: "Copper: keep left 64.5%, removes the Africa-map hologram at top right" },
   { id: "!n6ez!", verdict: "ok-crop", crop: [0, 0, 0.74, 1], note: "Military: keep left 74%, removes the continent emblem on the gate and truck" },
@@ -19,7 +19,7 @@ export const imagePolicy = [
   { id: "!x_dE!", verdict: "ok", note: "Translation Lag infographic (EV inline), no map" },
   { id: "artworks-iN3oLimeUXL5svGb", verdict: "ok", note: "Podcast ep. 001 art: blue circuit mask, no map" },
 ];
-// Essay → which screened image is its cover, when the feed's own cover isn't usable.
+// Article → which screened image is its cover, when the feed's own cover isn't usable.
 export const coverOverride = { "china-built-the-worlds-best-evs-then": "!S87B!" };
 export const policyFor = (url = "") => imagePolicy.find((p) => url.includes(p.id));
 export const usable = (p) => p && (p.verdict === "ok" || p.verdict === "ok-crop");

@@ -64,7 +64,7 @@ const gum = site.features.store ? (await read("gumroad")).filter((p) => site.fea
 for (const f of await fs.readdir("src/assets/covers")) if (f.startsWith("product-")) await fs.rm(`src/assets/covers/${f}`);
 
 const jobs = [];
-// Branded fallback cover (used only where the essay's own art was rejected):
+// Branded fallback cover (used only where the article's own art was rejected):
 // generated motif + teal-washed Thought Leaders portrait + topic kicker.
 const tlWash = await sharp("src/assets/brand/tl-portrait.jpg").resize(460, 675, { fit: "cover", position: "top" })
   .composite([{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="460" height="675"><defs><linearGradient id="w" x1="0" x2="1"><stop offset="0" stop-color="${INK}"/><stop offset=".45" stop-color="#2A7266" stop-opacity=".35"/><stop offset="1" stop-color="#2A7266" stop-opacity=".15"/></linearGradient></defs><rect width="460" height="675" fill="url(#w)"/></svg>`) }]).toBuffer();

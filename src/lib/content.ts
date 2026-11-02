@@ -21,7 +21,7 @@ export type Article = {
   image?: string | null; imageSrc?: string | null;
 };
 
-// Essay bodies arrive with h2/h3/h4 depending on the platform. The page H1 is the
+// Article bodies arrive with h2/h3/h4 depending on the platform. The page H1 is the
 // title, so shift body headings until the top level is h2 (no h1→h3 jumps).
 export function normalizeHeadings(html = "") {
   const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => +m[1]);
@@ -90,7 +90,7 @@ export const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" });
 export const platformLabel = (p: string) => ({ medium: "Medium", substack: "Substack", soundcloud: "SoundCloud", youtube: "YouTube" } as any)[p] ?? p;
 
-// ── Answer-first summary + key points (verbatim from the essay) ───────────
+// ── Answer-first summary + key points (verbatim from the article) ───────────
 const sentences = (t: string) => (t.match(/[^.!?]+(?:[.!?]+["”’)]*(?=\s|$)|$)/g) || []).map((x) => x.trim()).filter(Boolean);
 export function keyPointsFor(a: Article): { summary: string; points: string[]; curated: boolean } {
   const text = norm(plain(a.body || a.excerpt));
@@ -105,7 +105,7 @@ export function keyPointsFor(a: Article): { summary: string; points: string[]; c
     const points = (kp.points as string[]).filter(ok);
     if (summary) return { summary, points, curated: true };
   }
-  // Fallback: the essay's own subtitle, else its opening two sentences.
+  // Fallback: the article's own subtitle, else its opening two sentences.
   const first = plain((a.body || "").match(/<p>[\s\S]*?<\/p>/)?.[0] || a.excerpt);
   return { summary: a.subtitle || sentences(first).slice(0, 2).join(" "), points: [], curated: false };
 }
@@ -126,7 +126,7 @@ export function clip(t: string, max = 155) {
   return cut.slice(0, max - 1).replace(/\s+\S*$/, "").replace(/[,;:—–-]$/, "") + "…";
 }
 
-// Related essays: shared topic first, then shared title/tag words, then recency.
+// Related articles: shared topic first, then shared title/tag words, then recency.
 const STOP = new Set("the a an and or of to for in on is it its why what how with from by as at africa africas african nations s".split(" "));
 const toks = (a: Article) => new Set(`${a.title} ${a.tags.join(" ")}`.toLowerCase().replace(/[’']/g, "").split(/[^a-z0-9]+/).filter((w) => w.length > 2 && !STOP.has(w)));
 export function relatedTo(a: Article, topicOf: (t: string) => { label: string }, n = 3) {

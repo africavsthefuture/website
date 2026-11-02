@@ -17,7 +17,7 @@ const remote = img(e.image);
 const cover = remote ?? coverImg(`episode-${e.slug}`);
 const ogImage = `/og/episodes/${e.slug}.jpg`;
 const n = episodes.length - episodes.indexOf(e);
-// Essays that share words with the episode's own title and description.
+// Articles that share words with the episode's own title and description.
 const words = new Set(`${e.title} ${e.excerpt}`.toLowerCase().split(/[^a-z]+/).filter((w: string) => w.length > 4));
 const score = (a: Article) => `${a.title} ${a.subtitle ?? ""} ${a.excerpt}`.toLowerCase().split(/[^a-z]+/).filter((w) => words.has(w)).length;
 const related = [...articles].sort((a, b) => score(b) - score(a) || +new Date(b.published) - +new Date(a.published)).slice(0, 3);
@@ -49,7 +49,7 @@ const ld = [{ ...episodeLd(e, n), "@context": "https://schema.org" }, podcastSer
         <div class="band essay-signup">
           <div>
             <h2>Get new episodes by email.</h2>
-            <p>Free, from {site.name}. Every essay and episode as it's released.</p>
+            <p>Free, from {site.name}. Every article and episode as it's released.</p>
           </div>
           <SubscribeForm placement={`episode_${e.slug}`.slice(0, 60)} id="email-episode" />
         </div>
@@ -57,7 +57,7 @@ const ld = [{ ...episodeLd(e, n), "@context": "https://schema.org" }, podcastSer
       <aside><KeyFacts facts={facts} title="Episode details" /></aside>
     </div>
     <section class="section" aria-labelledby="ep-read">
-      <h2 id="ep-read" class="section-title" style="margin-bottom:1.5rem">Read the related essays</h2>
+      <h2 id="ep-read" class="section-title" style="margin-bottom:1.5rem">Read the related articles</h2>
       <div class="grid grid-3">{related.map((r) => <ArticleCard a={r} />)}</div>
       <p style="margin-top:1.5rem"><a class="text-link" href="/podcast">All {site.name} podcast episodes →</a></p>
     </section>

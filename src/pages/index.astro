@@ -29,14 +29,14 @@ const now = articles.slice(0, 4);
 const tickerItems = [...articles.map((a) => ({ t: a.title, h: `/articles/${a.slug}` })), ...episodes.map((e) => ({ t: e.title, h: "/podcast" }))];
 const ch = Object.fromEntries(site.channels.map((c) => [c.id, c]));
 const facts = [
-  { k: "What", v: "Essays and podcasts on the hard questions facing Africa's nations" },
+  { k: "What", v: "Articles and podcasts on the hard questions facing Africa's nations" },
   { k: "Topics", v: topics.join(" · ") },
-  { k: "Read free", v: `<a href="/articles">Every essay, in full, on this site</a> (also on Medium and Substack)` },
+  { k: "Read free", v: `<a href="/articles">Every article, in full, on this site</a> (also on Medium and Substack)` },
   { k: "Listen free", v: `<a href="${utm(ch.soundcloud.url, "keyfacts")}">SoundCloud</a> Community podcast` },
-  { k: "Latest essay", v: `<a href="/articles/${lead.slug}">${lead.title}</a> (${fmtDate(lead.published)})` },
+  { k: "Latest article", v: `<a href="/articles/${lead.slug}">${lead.title}</a> (${fmtDate(lead.published)})` },
 ];
 const channelBlurb: Record<string, string> = {
-  substack: "Free brief by email", medium: "Free essays", soundcloud: "Community podcast", youtube: "Video",
+  substack: "Free brief by email", medium: "Free articles", soundcloud: "Community podcast", youtube: "Video",
   bluesky: "Daily posts", mastodon: "Daily posts", x: "Daily posts", instagram: "Visual posts", tiktok: "Short video", gumroad: "Thought Leaders store",
 };
 const epCover = ep ? (img(ep.image) ?? coverImg(`episode-${ep.slug}`)) : undefined;
@@ -114,7 +114,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
   <section class="section" aria-labelledby="latest-title">
     <div class="wrap">
       <div class="section-head">
-        <div><span class="section-num">01 / Read</span><h2 id="latest-title" class="section-title">Latest essays</h2></div>
+        <div><span class="section-num">01 / Read</span><h2 id="latest-title" class="section-title">Latest articles</h2></div>
         <a class="text-link" href="/articles">All articles →</a>
       </div>
       <div class="feature-grid">
@@ -147,8 +147,8 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
           <p class="kicker">Free · Community</p>
           <h3>Start with the argument.</h3>
           <ul>
-            <li><div><b>Every essay, in full</b><span>Free to read on this site, also on Medium and Substack</span></div></li>
-            <li><div><b>Email sign-up</b><span>New essays and episodes in your inbox</span></div></li>
+            <li><div><b>Every article, in full</b><span>Free to read on this site, also on Medium and Substack</span></div></li>
+            <li><div><b>Email sign-up</b><span>New articles and episodes in your inbox</span></div></li>
             <li><div><b>SoundCloud Community podcast</b><span>{episodes.length} episode{episodes.length === 1 ? "" : "s"} so far</span></div></li>
           </ul>
           <div class="btns">
@@ -249,8 +249,8 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
       <div class="band">
         <div>
           <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Never miss a release</p>
-          <h2 id="band-title">Get every essay by email.</h2>
-          <p>New essays and episodes as they land, plus {site.briefing.title} when it's released.</p>
+          <h2 id="band-title">Get every article by email.</h2>
+          <p>New articles and episodes as they land, plus {site.briefing.title} when it's released.</p>
         </div>
         <div>
           <SubscribeForm placement="band" id="email-band" />

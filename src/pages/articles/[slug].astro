@@ -31,7 +31,7 @@ const isOrgAuthor = !a.author || a.author === site.name;
 const author = isOrgAuthor
   ? { "@type": "Organization", "@id": `${site.url}/#org`, name: site.name, url: site.url }
   : { "@type": "Person", name: a.author };
-const ogAlt = `${a.title}: ${site.name} essay cover`;
+const ogAlt = `${a.title}: ${site.name} article cover`;
 const ld = [
   {
     "@context": "https://schema.org", "@type": "BlogPosting", "@id": `${pageUrl}#article`,
@@ -54,13 +54,13 @@ const facts = [
   { k: "Also on", v: `<a href="${original}">${platformLabel(a.platform)} ↗</a>` },
 ];
 ---
-<!-- Canonical is this page: the site is the home of every essay. Medium/Substack copies should point their canonical here. -->
+<!-- Canonical is this page: the site is the home of every article. Medium/Substack copies should point their canonical here. -->
 <Base title={a.title} description={desc} canonical={pageUrl} type="article" image={ogImage} imageAlt={ogAlt} published={a.published} modified={lastmodOf(a)} jsonld={ld} crumbs={[{ name: "Articles", path: "/articles" }, { name: a.title, path: `/articles/${a.slug}` }]}>
   <div class="wrap" style="padding-top:2rem">
     <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles">Articles</a> / <span aria-current="page">{topic}</span></nav>
     <div class="summary-grid">
       <article class="essay">
-        <p class="eyebrow">{topic} · Essay{mins && ` · ${mins} min read`}</p>
+        <p class="eyebrow">{topic} · Article{mins && ` · ${mins} min read`}</p>
         <h1 class="essay-title">{a.title}</h1>
         {a.subtitle && <p class="lede">{a.subtitle}</p>}
         <p class="byline"><span>By <strong>{a.author}</strong></span><span>Published <time datetime={a.published}><strong>{fmtDate(a.published)}</strong></time></span>{a.updated && a.updated.slice(0, 10) !== a.published.slice(0, 10) && <span>Updated <time datetime={a.updated}>{fmtDate(a.updated)}</time></span>}</p>
@@ -72,7 +72,7 @@ const facts = [
             <h3 class="answer-sub">Key points</h3>
             <ul>{kp.points.map((p) => <li>{p}</li>)}</ul>
           </>)}
-          <p class="answer-note">{kp.curated ? "Quoted directly from the essay below." : "From the essay's own opening."}</p>
+          <p class="answer-note">{kp.curated ? "Quoted directly from the article below." : "From the article's own opening."}</p>
         </section>
         {hasBody ? (
           <div class="prose essay-body" set:html={a.body} />
@@ -84,25 +84,25 @@ const facts = [
         <div class="band essay-signup" id="signup">
           <div>
             <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Enjoyed this?</p>
-            <h2>Get the next essay by email.</h2>
+            <h2>Get the next article by email.</h2>
             <p>Free, from {site.name}. Plus {site.briefing.title} when it's released.</p>
           </div>
           <SubscribeForm placement={`article_${a.slug}`.slice(0, 60)} id="email-article" />
         </div>
       </article>
       <aside>
-        <KeyFacts facts={facts} title="About this essay" />
+        <KeyFacts facts={facts} title="About this article" />
         <BriefingOffer variant="compact" />
         <AdSlot kind="rail" id="article-rail-1" />
       </aside>
     </div>
     <section class="section" aria-labelledby="more-title">
-      <h2 id="more-title" class="section-title" style="margin-bottom:1.5rem">Related essays</h2>
+      <h2 id="more-title" class="section-title" style="margin-bottom:1.5rem">Related articles</h2>
       <div class="grid grid-3">{related.map((r) => <ArticleCard a={r} />)}</div>
-      <nav class="essay-pager" aria-label="More essays">
-        {older && <p><span class="eyebrow">Previous essay</span><a class="text-link" href={`/articles/${older.slug}`}>{older.title}</a></p>}
-        {newer && <p><span class="eyebrow">Next essay</span><a class="text-link" href={`/articles/${newer.slug}`}>{newer.title}</a></p>}
-        <p><span class="eyebrow">Archive</span><a class="text-link" href="/articles">All {site.name} essays</a></p>
+      <nav class="essay-pager" aria-label="More articles">
+        {older && <p><span class="eyebrow">Previous article</span><a class="text-link" href={`/articles/${older.slug}`}>{older.title}</a></p>}
+        {newer && <p><span class="eyebrow">Next article</span><a class="text-link" href={`/articles/${newer.slug}`}>{newer.title}</a></p>}
+        <p><span class="eyebrow">Archive</span><a class="text-link" href="/articles">All {site.name} articles</a></p>
       </nav>
     </section>
   </div>

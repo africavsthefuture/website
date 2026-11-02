@@ -44,20 +44,20 @@ The home hero visual (`src/components/SignalField.astro`) is inline SVG with CSS
 
 ## Pages
 - `/`
-- `/articles` and `/articles/<slug>`: every essay in full. The canonical is this site; Medium/Substack are listed as `sameAs`. Each essay opens with an "In brief" block whose summary and key points are verbatim quotes from the essay (`src/data/key-points.mjs`; the build drops any line that is not found word-for-word in the essay text). New essays without an entry fall back to their subtitle or opening sentences.
+- `/articles` and `/articles/<slug>`: every article in full. The canonical is this site; Medium/Substack are listed as `sameAs`. Each article opens with an "In brief" block whose summary and key points are verbatim quotes from the article (`src/data/key-points.mjs`; the build drops any line that is not found word-for-word in the article text). New articles without an entry fall back to their subtitle or opening sentences.
 - `/podcast` and `/podcast/<slug>`: one page per SoundCloud episode.
 - `/store/...`: only built when `features.store` is `true` (catch-all route `src/pages/store/[...path].astro`)
 - `/about` (includes the "About AvtF" entity block and the FAQ / FAQPage), `/contact`, `/privacy`, `/briefing`
 - A real `/404`
 - `/thought-leaders` redirects to `/#subscribe` (the Substack subscribe section)
-- Machine-readable: `/robots.txt`, `/sitemap.xml` (copy of `/sitemap-index.xml`, written by `scripts/postbuild.mjs`), `/sitemap-0.xml` (lastmod from the feeds), `/rss.xml` (full-text essays), `/llms.txt`, `/llms-full.txt` (every essay as markdown), `/ads.txt`, `/<indexNowKey>.txt`
+- Machine-readable: `/robots.txt`, `/sitemap.xml` (copy of `/sitemap-index.xml`, written by `scripts/postbuild.mjs`), `/sitemap-0.xml` (lastmod from the feeds), `/rss.xml` (full-text articles), `/llms.txt`, `/llms-full.txt` (every article as markdown), `/ads.txt`, `/<indexNowKey>.txt`
 
 ## SEO / AEO checks
 ```bash
 npm run audit      # after a build: titles, descriptions, H1/heading order, canonical, hreflang, OG/Twitter images, alt/size, internal links, JSON-LD, sitemap coverage
 npm run indexnow   # after a deploy: submits every live sitemap URL to api.indexnow.org (DRY=1 to preview)
 ```
-JSON-LD per page: Organization + WebSite (all pages), BreadcrumbList (all but home), BlogPosting (essays), PodcastSeries/PodcastEpisode (podcast), AboutPage + FAQPage (about), CollectionPage (articles).
+JSON-LD per page: Organization + WebSite (all pages), BreadcrumbList (all but home), BlogPosting (articles), PodcastSeries/PodcastEpisode (podcast), AboutPage + FAQPage (about), CollectionPage (articles).
 
 ## Open placeholders (search the code for `TODO(`)
 | Tag | Where | What's needed |

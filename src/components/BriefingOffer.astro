@@ -29,7 +29,7 @@ const status = live ? "Free guide" : "Coming soon";
       <p class="kicker">{live ? "Free guide" : "Free guide · coming soon"}</p>
       <H class="brief-title" id={id}>{b.title}</H>
       <p class="brief-sub">{b.subtitle}.</p>
-      <p class="brief-body">A free guide built from our published essays. {live ? "Subscribe and it lands in your inbox." : "It's being prepared now. Subscribe free and you'll get it the day it's released."}</p>
+      <p class="brief-body">A free guide built from our published articles. {live ? "Subscribe and it lands in your inbox." : "It's being prepared now. Subscribe free and you'll get it the day it's released."}</p>
       <SubscribeForm placement={placement} id={`email-${placement}`} cta={live ? "Get the free Briefing" : "Subscribe free"} note={live ? site.signupNote : `${site.signupNote} The Briefing is sent to subscribers when it's released.`} />
     </div>
   </div>

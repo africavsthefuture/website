@@ -69,10 +69,11 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
   {!noindex && <link rel="alternate" hreflang="x-default" href={canonicalUrl} />}
   {noindex && <meta name="robots" content="noindex, follow" />}
   <meta name="theme-color" content="#0F1923" />
+  <meta name="google-site-verification" content="A-2F2UnUXbgUW-IAm9xZzNM8t_RdViEePMaaLP3py5k" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={`${site.name}: essays (RSS)`} />
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={`${site.name}: articles (RSS)`} />
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM summary" />
   <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM full text" />
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -134,7 +135,7 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
           <p class="footer-tag"><strong>{site.tagline}.</strong> {site.supportLine}</p>
         </div>
         <div class="footer-sub" id="subscribe">
-          <p class="kicker">Get every essay by email</p>
+          <p class="kicker">Get every article by email</p>
           <SubscribeForm placement="footer" id="email-footer" />
         </div>
       </div>
@@ -156,7 +157,7 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
   </footer>
 
   <div class="sticky-sub" data-sticky-sub>
-    <p><strong>Free essays</strong> by email</p>
+    <p><strong>Free articles</strong> by email</p>
     <a class="btn btn-gold btn-sm" href="#subscribe">Subscribe</a>
   </div>
 

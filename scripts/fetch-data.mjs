@@ -14,7 +14,7 @@ import sharp from "sharp";
 import { policyFor, usable, coverOverride } from "../src/data/image-policy.mjs";
 const PUB_IMG = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "public/essay-img");
 
-// Full essay body for on-site reading. Inline images/figures/embeds are removed on
+// Full article body for on-site reading. Inline images/figures/embeds are removed on
 // purpose: feed artwork is third-party and some of it uses continent/map imagery,
 // which the brand rules out. Text, headings, lists, quotes, links and tables stay.
 function cleanBody(html = "") {
@@ -32,7 +32,7 @@ function cleanBody(html = "") {
   // Drop Medium's "originally published" tracker line and Substack share/subscribe chrome.
   out = out.replace(/<p>\s*<a[^>]*>\s*(Subscribe now|Share|Leave a comment)\s*<\/a>\s*<\/p>/gi, "");
   out = out.replace(/<a href="https:\/\/medium\.com\/_\/stat[^"]*"[^>]*><\/a>/gi, "");
-  // Growth phase: no sales CTAs or platform boilerplate inside on-site essays.
+  // Growth phase: no sales CTAs or platform boilerplate inside on-site articles.
   out = out.replace(/<p>(?:(?!<\/p>)[\s\S])*?(gumroad\.com|Thanks for reading|Subscribe for free to receive new posts)(?:(?!<\/p>)[\s\S])*?<\/p>/gi, "");
   out = out.replace(/<p>(\s|<br\s*\/?>)*-{3,}(\s|<br\s*\/?>)*<\/p>/gi, "");
   out = out.replace(/(<br\s*\/?>\s*){2,}/gi, "<br />");
@@ -159,7 +159,7 @@ async function medium() {
     const slug = link.split("/").pop().replace(/-[0-9a-f]{10,14}$/, "");
     const img = pickCover(slug, imgs);
     // Medium truncates long titles in the feed ("…"). The full title is the
-    // essay's first heading, so take it from there (and drop the duplicate heading).
+    // article's first heading, so take it from there (and drop the duplicate heading).
     let title = decode(txt(i.title)).trim();
     const firstH = html.match(/<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/);
     const firstHText = firstH ? strip(firstH[1]) : "";

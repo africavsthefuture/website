@@ -2,11 +2,11 @@ import type { APIRoute } from "astro";
 import { site, liveChannels } from "../site.config.mjs";
 import { articles, episodes, fmtDate, platformLabel, keyPointsFor, episodePath, lastmodOf } from "../lib/content";
 import { toMarkdown, demote } from "../lib/markdown";
-// llms-full.txt: the complete text of every essay as clean markdown, for AI answer engines.
+// llms-full.txt: the complete text of every article as clean markdown, for AI answer engines.
 export const GET: APIRoute = () => {
   const L: string[] = [];
-  L.push(`# ${site.name}: full text of every essay`, "", `> ${site.supportLine}`, "",
-    `Source: ${site.url}. ${articles.length} essays, newest first. Each essay is published in full at its canonical URL on this site and also on Medium or Substack. Short name: ${site.shortName}. Tagline: "${site.tagline}". Index: ${site.url}/llms.txt`, "");
+  L.push(`# ${site.name}: full text of every article`, "", `> ${site.supportLine}`, "",
+    `Source: ${site.url}. ${articles.length} articles, newest first. Each article is published in full at its canonical URL on this site and also on Medium or Substack. Short name: ${site.shortName}. Tagline: "${site.tagline}". Index: ${site.url}/llms.txt`, "");
   for (const a of articles) {
     const kp = keyPointsFor(a);
     const url = `${site.url}/articles/${a.slug}`;
@@ -17,7 +17,7 @@ export const GET: APIRoute = () => {
       `- Author: ${a.author || site.name}`, `- Also on ${platformLabel(a.platform)}: ${a.url}`,
       ...(a.tags.length ? [`- Tags: ${a.tags.join(", ")}`] : []), "");
     L.push("### In brief", "", kp.summary, "");
-    if (kp.points.length) L.push("Key points (quoted from the essay):", "", ...kp.points.map((p) => `- ${p}`), "");
+    if (kp.points.length) L.push("Key points (quoted from the article):", "", ...kp.points.map((p) => `- ${p}`), "");
     L.push("### Full text", "", demote(toMarkdown(a.body || a.excerpt), 2), "");
   }
   L.push("---", "", "## Podcast episodes", "");

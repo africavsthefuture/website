@@ -13,7 +13,7 @@ export const site = {
   // Positioning lines supplied by the user (verbatim).
   supportLine: "Taking a critical and progressive look at the underlying challenges facing the African future.",
   welcome: "Welcome to Africa vs The Future. Our goal is to help inspire traction and real world action in dealing with the often ignored underlying challenges facing Africa in the 21st century.",
-  signupNote: "Free essays and podcast episodes. Unsubscribe anytime.",
+  signupNote: "Free articles and podcast episodes. Unsubscribe anytime.",
 
   // Lead magnet. status "coming-soon" until the guide is published; then set "live"
   // (and add deliveryUrl) and the hero/offer copy switches to "Get the free Briefing".
@@ -39,7 +39,7 @@ export const site = {
   // miniBooks: mini-books are not ready, so they stay hidden even when the store is on.
   features: { store: false, miniBooks: false },
 
-  // Covers: true = use each essay's own feed artwork where it passed screening
+  // Covers: true = use each article's own feed artwork where it passed screening
   // (src/data/image-policy.mjs, with crops applied). Rejected/unscreened images
   // fall back to the branded generated cover.
   covers: { remote: true },

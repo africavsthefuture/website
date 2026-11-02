@@ -1,11 +1,11 @@
 {
- "builtAt": "2026-11-02T03:36:28.781Z",
+ "builtAt": "2026-11-02T03:39:56.593Z",
  "report": {
-  "medium": "CACHE from 2026-11-02T03:35:21.956Z (OFFLINE=1)",
-  "substack": "CACHE from 2026-11-02T03:35:28.171Z (OFFLINE=1)",
+  "medium": "CACHE from 2026-11-02T03:39:23.678Z (OFFLINE=1)",
+  "substack": "CACHE from 2026-11-02T03:39:29.984Z (OFFLINE=1)",
   "youtube": "CACHE from 2026-11-02T03:27:20.880Z (OFFLINE=1)",
-  "soundcloud": "CACHE from 2026-11-02T03:35:29.927Z (OFFLINE=1)",
-  "bluesky": "CACHE from 2026-11-02T03:35:30.056Z (OFFLINE=1)",
-  "gumroad": "CACHE from 2026-11-02T03:35:33.040Z (OFFLINE=1)"
+  "soundcloud": "CACHE from 2026-11-02T03:39:32.217Z (OFFLINE=1)",
+  "bluesky": "CACHE from 2026-11-02T03:39:32.410Z (OFFLINE=1)",
+  "gumroad": "CACHE from 2026-11-02T03:39:35.434Z (OFFLINE=1)"
  }
 }

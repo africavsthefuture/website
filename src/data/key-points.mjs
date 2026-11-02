@@ -1,10 +1,10 @@
-// Answer-first summaries and key points for each essay.
-// RULE: every string here must be a VERBATIM quote of the essay's own text
+// Answer-first summaries and key points for each article.
+// RULE: every string here must be a VERBATIM quote of the article's own text
 // (src/lib/content.ts checks this at build time and drops anything that is not
-// found in the essay body, so no new claims can reach the page).
-// `summary` = 1–2 sentences that answer "what is this essay arguing?".
+// found in the article body, so no new claims can reach the page).
+// `summary` = 1–2 sentences that answer "what is this article arguing?".
 // `points`  = 3–5 sentences that carry the argument.
-// New essays without an entry fall back to their subtitle / opening sentences.
+// New articles without an entry fall back to their subtitle / opening sentences.
 export const keyPoints = {
   "livelihoods-or-cleanliness-the-economics-behind-africas-vendor-crackdowns": {
     summary: ["Lusaka, Harare and Accra are moving traders off their pavements.", "The pavements keep filling up again.", "Is the problem the vendor, or the plan?"],

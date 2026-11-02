@@ -5,15 +5,15 @@ import fs from "node:fs";
 
 const SITE = "https://www.africavsthefuture.xyz";
 // lastmod for the sitemap comes from the feeds (written by scripts/fetch-data.mjs
-// before `astro build`): each essay's updated/published date, each episode's date.
+// before `astro build`): each article's updated/published date, each episode's date.
 const read = (f) => { try { return JSON.parse(fs.readFileSync(new URL(`./src/data/${f}.json`, import.meta.url), "utf8")); } catch { return null; } };
-const essays = [...(read("medium") || []), ...(read("substack") || [])];
+const articles = [...(read("medium") || []), ...(read("substack") || [])];
 const eps = read("soundcloud")?.episodes || [];
 const lastmod = new Map();
 const newest = (dates) => dates.filter(Boolean).sort().at(-1);
-for (const a of essays) lastmod.set(`${SITE}/articles/${a.slug}`, a.updated || a.published);
+for (const a of articles) lastmod.set(`${SITE}/articles/${a.slug}`, a.updated || a.published);
 for (const e of eps) lastmod.set(`${SITE}/podcast/${e.slug}`, e.published);
-const newestEssay = newest(essays.map((a) => a.updated || a.published));
+const newestEssay = newest(articles.map((a) => a.updated || a.published));
 const newestEp = newest(eps.map((e) => e.published));
 lastmod.set(`${SITE}/articles`, newestEssay);
 lastmod.set(`${SITE}/podcast`, newestEp);
