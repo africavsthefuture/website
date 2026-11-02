@@ -9,7 +9,8 @@ import tlPortrait from "../assets/brand/tl-portrait.jpg";
 import { faq, faqJsonLd } from "../lib/faq";
 import { site, utm, liveChannels } from "../site.config.mjs";
 // Copy paraphrases media-studio inputs/01_branding/business_description.md.
-const ld = [{ "@context": "https://schema.org", "@type": "AboutPage", name: "About Africa vs The Future", url: `${site.url}/about`, about: { "@id": `${site.url}/#org` } }, faqJsonLd];
+const ld = [{ "@context": "https://schema.org", "@type": "AboutPage", "@id": `${site.url}/about#page`, name: "About Africa vs The Future", url: `${site.url}/about`, about: { "@id": `${site.url}/#org` }, mainEntity: { "@id": `${site.url}/#org` }, isPartOf: { "@id": `${site.url}/#website` }, inLanguage: site.lang }, faqJsonLd];
+const channels = liveChannels();
 const facts = [
   { k: "Focus", v: "The hardest, most impactful questions facing the nations of the African continent" },
   { k: "Audience", v: "Citizens, builders, funders and thinkers across the continent's 55 states" },
@@ -18,7 +19,7 @@ const facts = [
   { k: "Formats", v: "Essays (on this site, also on Medium and Substack) · Podcast (SoundCloud)" },
 ];
 ---
-<Base title="About Africa vs The Future" description={site.welcome} jsonld={ld}>
+<Base title="About Africa vs The Future (AvtF)" description={`About Africa vs The Future (AvtF): essays and a free podcast. ${site.supportLine}`} jsonld={ld} crumbs={[{ name: "About", path: "/about" }]}>
   <div class="wrap">
     <header class="page-head two-col" style="align-items:center">
       <div>
@@ -47,13 +48,25 @@ const facts = [
           <li><strong>Thought Leaders (paid):</strong> the Substack paid edition{site.features.store && ", plus podcast deep-dives on Gumroad"}.</li>
         </ul>
         <h2>Follow</h2>
-        <p>{liveChannels().map((c, n) => <>{n > 0 && " · "}<a href={utm(c.url, "channels", "about")} rel={c.rel === "me" ? "me noopener" : "noopener"}>{c.label}</a></>)}</p>
+        <p>{channels.map((c, n) => <>{n > 0 && " · "}<a href={utm(c.url, "channels", "about")} rel={c.rel === "me" ? "me noopener" : "noopener"}>{c.label}</a></>)}</p>
       </div>
       <div style="display:grid;gap:1.5rem">
         <KeyFacts facts={facts} />
         <SubscribeForm placement="about" heading="Get every essay by email" />
       </div>
     </div>
+    <section class="entity-box" id="about-avtf" aria-labelledby="entity-title">
+      <h2 id="entity-title" class="section-title" style="font-size:1.6rem;margin:0 0 .75rem">About AvtF</h2>
+      <p><strong>{site.name}</strong> (short name <strong>{site.shortName}</strong>) is a media and thought-leadership project. It publishes researched essays and a free Community podcast on the hardest and most impactful questions facing the nations of the African continent. {site.supportLine}</p>
+      <dl>
+        <dt>Name</dt><dd>{site.name} ({site.shortName})</dd>
+        <dt>Tagline</dt><dd>{site.tagline}</dd>
+        <dt>Website</dt><dd><a href={`${site.url}/`}>{site.url.replace(/^https:\/\//, "")}</a></dd>
+        <dt>Publishes</dt><dd>Essays (<a href="/articles">in full on this site</a>, also on Medium and Substack) and the <a href="/podcast">Community podcast</a> (SoundCloud)</dd>
+        <dt>Stance</dt><dd>Not Pan-African. Argues for aligned and enlightened self-interest between African nations (AESIFAN)</dd>
+        <dt>Official channels</dt><dd><ul class="entity-channels">{channels.map((c) => <li><a href={c.url} rel={c.rel === "me" ? "me noopener" : "noopener"}>{c.label}</a>{c.id === "x" ? ` (${site.x.handle})` : c.id === "tiktok" ? ` (${site.tiktok.handle})` : c.id === "bluesky" ? ` (@${site.bluesky.handle})` : ""}</li>)}</ul></dd>
+      </dl>
+    </section>
     <div class="section"><Faq items={faq} /></div>
   </div>
 </Base>

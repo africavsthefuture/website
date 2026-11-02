@@ -158,9 +158,16 @@ async function medium() {
     const imgs = [...html.matchAll(/<img[^>]+src="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.includes("/_/stat"));
     const slug = link.split("/").pop().replace(/-[0-9a-f]{10,14}$/, "");
     const img = pickCover(slug, imgs);
-    const inl = await inlineImages(html, slug, img, decode(txt(i.title)));
+    // Medium truncates long titles in the feed ("…"). The full title is the
+    // essay's first heading, so take it from there (and drop the duplicate heading).
+    let title = decode(txt(i.title)).trim();
+    const firstH = html.match(/<h[1-4][^>]*>([\s\S]*?)<\/h[1-4]>/);
+    const firstHText = firstH ? strip(firstH[1]) : "";
+    if (title.endsWith("…") && firstHText.startsWith(title.slice(0, -1).trim())) title = firstHText;
+    const htmlNoDup = firstH && firstHText === title ? html.replace(firstH[0], "") : html;
+    const inl = await inlineImages(htmlNoDup, slug, img, title);
     out.push({
-      platform: "medium", slug, title: decode(txt(i.title)), url: link,
+      platform: "medium", slug, title, url: link,
       author: decode(txt(i["dc:creator"])) || "Africa vs The Future",
       published: new Date(txt(i.pubDate)).toISOString(),
       updated: i["atom:updated"] ? new Date(txt(i["atom:updated"])).toISOString() : null,

@@ -7,7 +7,7 @@ import { site } from "../site.config.mjs";
 const b = site.briefing;
 const ld = [{ "@context": "https://schema.org", "@type": "WebPage", name: b.title, url: `${site.url}${b.path}`, description: `${b.subtitle}. A free guide from ${site.name}.`, isPartOf: { "@id": `${site.url}/#website` }, publisher: { "@id": `${site.url}/#org` } }];
 ---
-<Base title={`${b.title}: free guide`} description={`${b.subtitle}. A free guide from ${site.name}, built from our published essays. ${b.status === "live" ? "Get it free" : "Coming soon: get it free"} when you subscribe.`} jsonld={ld}>
+<Base title={`${b.title}: free guide`} description={`${b.subtitle}. A free ${site.shortName} guide, ${b.status === "live" ? "free when you subscribe" : "coming soon, free to subscribers"}.`} jsonld={ld} crumbs={[{ name: "Free Briefing", path: b.path }]}>
   <div class="wrap">
     <header class="page-head">
       <p class="eyebrow">Free guide</p>

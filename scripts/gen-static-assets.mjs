@@ -80,8 +80,10 @@ async function fallbackCover(a, text) {
   </svg>`;
   return sharp(bg).composite([{ input: tlWash, left: 740, top: 0 }, { input: Buffer.from(overlay) }]).png({ compressionLevel: 9 }).toFile(`src/assets/covers/article-${a.slug}.png`);
 }
-async function articleOg(a, text) {
-  const coverFile = a.image ? `src/assets/remote/${a.image}` : `src/assets/covers/article-${a.slug}.png`;
+async function articleOg(a, text, { coverFile, out, kicker } = {}) {
+  coverFile ??= a.image ? `src/assets/remote/${a.image}` : `src/assets/covers/article-${a.slug}.png`;
+  out ??= `public/og/articles/${a.slug}.jpg`;
+  kicker ??= `AFRICA VS THE FUTURE · ${topicOf(text).label.toUpperCase()}`;
   const art = await sharp(coverFile).resize(1200, 630, { fit: "cover", position: "centre" }).modulate({ saturation: 0.9 }).toBuffer();
   const L = lines(a.title, 54, 860, 4);
   const y0 = 630 - 120 - (L.length - 1) * 62;
@@ -90,11 +92,11 @@ async function articleOg(a, text) {
     <linearGradient id="s" x1="0" x2="1"><stop offset="0" stop-color="${INK}" stop-opacity=".7"/><stop offset=".75" stop-color="${INK}" stop-opacity="0"/></linearGradient></defs>
     <rect width="1200" height="630" fill="url(#b)"/><rect width="1200" height="630" fill="url(#s)"/>
     <rect x="0" y="0" width="1200" height="8" fill="#2A7266"/>
-    <text x="64" y="${y0 - 66}" font-family="IBM Plex Mono" font-weight="600" font-size="20" letter-spacing="4" fill="#E09D3E">AFRICA VS THE FUTURE · ${esc(topicOf(text).label.toUpperCase())}</text>
+    <text x="64" y="${y0 - 66}" font-family="IBM Plex Mono" font-weight="600" font-size="20" letter-spacing="4" fill="#E09D3E">${esc(kicker)}</text>
     ${L.map((ln, i) => `<text x="64" y="${y0 + i * 62}" font-family="Outfit" font-weight="900" font-size="54" fill="#F5EFE2">${esc(ln)}</text>`).join("")}
     <text x="64" y="590" font-family="IBM Plex Mono" font-size="18" fill="#C9CFCC">africavsthefuture.xyz</text>
   </svg>`;
-  return sharp(art).composite([{ input: Buffer.from(svg) }]).jpeg({ quality: 84, mozjpeg: true }).toFile(`public/og/articles/${a.slug}.jpg`);
+  return sharp(art).composite([{ input: Buffer.from(svg) }]).jpeg({ quality: 84, mozjpeg: true }).toFile(out);
 }
 for (const a of articles) {
   const text = `${a.title} ${(a.tags || []).join(" ")}`;
@@ -107,4 +109,10 @@ for (const p of gum)
   jobs.push(sharp(Buffer.from(coverSvg({ seed: p.slug, text: p.name, W: 1000, H: 1000, label: p.kind === "podcast" ? "Thought Leaders · Podcast" : "Thought Leaders", index: p.issue ?? undefined }))).png().toFile(`src/assets/covers/product-${p.slug}.png`));
 jobs.push(sharp(Buffer.from(coverSvg({ seed: "about", text: "strategy", W: 1000, H: 1000, label: "Africa vs The Future" }))).png().toFile("src/assets/covers/about.png"));
 await Promise.all(jobs);
+// Episode OG cards: screened episode artwork (or the generated cover) + title. Runs after covers exist.
+await fs.mkdir("public/og/episodes", { recursive: true });
+await Promise.all((sc.episodes || []).map((e) => articleOg(e, e.title, {
+  coverFile: e.image && site.covers.remote ? `src/assets/remote/${e.image}` : `src/assets/covers/episode-${e.slug}.png`,
+  out: `public/og/episodes/${e.slug}.jpg`, kicker: "AFRICA VS THE FUTURE · PODCAST",
+})));
 console.log(`[assets] community mark, favicons, ${articles.length} article covers + OG, ${sc.episodes?.length ?? 0} episode, ${gum.length} product`);

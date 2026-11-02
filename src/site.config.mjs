@@ -23,6 +23,11 @@ export const site = {
     status: "coming-soon",
     path: "/briefing",
   },
+  // Social handles (used for twitter:site and the entity description).
+  x: { handle: "@AfricaVTFuture" },
+  tiktok: { handle: "@africavsfuture0" },
+  // IndexNow key (https://www.indexnow.org). The key file lives at public/<key>.txt.
+  indexNowKey: "7c1f4e2a9b6d4f0e8a3c5b2d1e9f6a47",
   locale: "en_GB",
   lang: "en-GB",
   logoPath: "/brand/logo-512.png", // Community portrait mark
@@ -70,7 +75,7 @@ export const site = {
     { id: "mastodon", label: "Mastodon", url: "https://mastodon.social/@africavsthefuture", tier: "social", verb: "Follow", rel: "me" },
     { id: "x", label: "X", url: "https://x.com/AfricaVTFuture", tier: "social", verb: "Follow" },
     { id: "instagram", label: "Instagram", url: "https://www.instagram.com/africavsthefuture/", tier: "social", verb: "Follow" },
-    { id: "tiktok", label: "TikTok", url: "https://www.tiktok.com/@africavsfuture", tier: "social", verb: "Follow" },
+    { id: "tiktok", label: "TikTok", url: "https://www.tiktok.com/@africavsfuture0", tier: "social", verb: "Follow" },
     { id: "gumroad", label: "Gumroad", url: "https://africavsthefuture.gumroad.com/", tier: "thought-leaders", verb: "Shop", requires: "store" },
   ],
 

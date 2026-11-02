@@ -6,11 +6,13 @@
   "scripts": {
     "fetch": "node scripts/fetch-data.mjs",
     "dev": "astro dev",
-    "build": "node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build",
-    "build:offline": "OFFLINE=1 node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build",
+    "build": "node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build && node scripts/postbuild.mjs",
+    "build:offline": "OFFLINE=1 node scripts/fetch-data.mjs && node scripts/gen-static-assets.mjs && astro build && node scripts/postbuild.mjs",
     "preview": "astro preview --port 4321 --host 127.0.0.1",
     "build:ads": "esbuild src/scripts/ads.ts --format=iife --target=es2019 --minify --outfile=public/js/ads.js",
-    "shots": "python3 scripts/screenshots.py"
+    "shots": "python3 scripts/screenshots.py",
+    "audit": "node scripts/seo-audit.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -22,10 +24,12 @@
     "gsap": "^3.15.0",
     "sanitize-html": "^2.17.5",
     "sharp": "^0.35.5",
-    "simple-icons": "^16.35.0"
+    "simple-icons": "^16.35.0",
+    "turndown": "^7.2.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "cheerio": "^1.2.0",
     "esbuild": "^0.28.2",
     "tailwindcss": "^4.3.3"
   }

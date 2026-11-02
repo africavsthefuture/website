@@ -6,6 +6,7 @@ export const TOPICS = [
   [/\bEVs?\b|electric vehicle/i, "EVs", "waves"],
   [/algorithm|\bAI\b|english|language|lingua/i, "AI & language", "matrix"],
   [/AESIFAN|self-interest|realism|strategy/i, "Strategy", "orbits"],
+  [/vendor|street-vending|informal|livelihood/i, "Urban economy", "grid"],
 ];
 export function topicOf(text = "") {
   for (const [re, label, motif] of TOPICS) if (re.test(text)) return { label, motif };

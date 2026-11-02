@@ -17,21 +17,36 @@ import { site, utm, liveChannels } from "../site.config.mjs";
 import { ClientRouter } from "astro:transitions";
 
 interface Props {
-  title: string; description: string; canonical?: string; image?: string; type?: string;
+  title: string; description: string; canonical?: string; image?: string; imageAlt?: string; type?: string;
   jsonld?: object[]; noindex?: boolean; published?: string; modified?: string;
+  // Breadcrumb trail after Home. Default: one crumb named after the page. `false` = none (home).
+  crumbs?: { name: string; path: string }[] | false;
 }
-const { title, description, canonical, image, type = "website", jsonld = [], noindex = false, published, modified } = Astro.props;
+const { title, description, canonical, image, imageAlt, type = "website", jsonld = [], noindex = false, published, modified, crumbs } = Astro.props;
 const path = Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/") || "/";
 const canonicalUrl = canonical ?? new URL(path, site.url).toString();
 const ogImage = image ? new URL(image, site.url).toString() : `${site.url}/og/default.jpg`;
-const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const ogAlt = imageAlt ?? (image ? title : `${site.name}: ${site.tagline}`);
+// Keep <title> within ~65 chars: full brand suffix, then the short name, then the bare headline.
+const fullTitle = title.includes(site.name) ? title
+  : `${title} | ${site.name}`.length <= 65 ? `${title} | ${site.name}`
+  : `${title} | ${site.shortName}`.length <= 65 ? `${title} | ${site.shortName}` : title;
 const channels = liveChannels();
 const sameAs = channels.map((c) => c.url);
 const org = {
   "@context": "https://schema.org", "@type": "Organization", "@id": `${site.url}/#org`,
-  name: site.name, url: site.url, logo: `${site.url}${site.logoPath}`, description: site.description, slogan: site.tagline, sameAs,
+  name: site.name, alternateName: site.shortName, url: site.url,
+  logo: { "@type": "ImageObject", "@id": `${site.url}/#logo`, url: `${site.url}${site.logoPath}`, width: 512, height: 512, caption: site.name },
+  image: { "@id": `${site.url}/#logo` },
+  description: site.supportLine, slogan: site.tagline, sameAs,
 };
-const webSite = { "@context": "https://schema.org", "@type": "WebSite", "@id": `${site.url}/#website`, name: site.name, alternateName: site.shortName, slogan: site.tagline, url: site.url, publisher: { "@id": `${site.url}/#org` }, inLanguage: site.lang };
+const webSite = { "@context": "https://schema.org", "@type": "WebSite", "@id": `${site.url}/#website`, name: site.name, alternateName: site.shortName, slogan: site.tagline, description: site.description, url: `${site.url}/`, publisher: { "@id": `${site.url}/#org` }, inLanguage: site.lang };
+const trail = crumbs === false || path === "/" || noindex ? null : (crumbs ?? [{ name: title, path }]);
+const breadcrumbLd = trail && {
+  "@context": "https://schema.org", "@type": "BreadcrumbList",
+  itemListElement: [{ name: "Home", path: "/" }, ...trail].map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.path === "/" ? `${site.url}/` : `${site.url}${c.path}` })),
+};
+const ld = [org, webSite, ...(breadcrumbLd ? [breadcrumbLd] : []), ...jsonld];
 const nav = [
   { href: "/articles", label: "Articles" },
   { href: "/podcast", label: "Podcast" },
@@ -50,12 +65,17 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
   {!noindex && <link rel="canonical" href={canonicalUrl} />}
+  {!noindex && <link rel="alternate" hreflang="en" href={canonicalUrl} />}
+  {!noindex && <link rel="alternate" hreflang="x-default" href={canonicalUrl} />}
   {noindex && <meta name="robots" content="noindex, follow" />}
   <meta name="theme-color" content="#0F1923" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" href="/rss.xml" title={`${site.name}: essays (RSS)`} />
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM summary" />
+  <link rel="alternate" type="text/plain" href="/llms-full.txt" title="LLM full text" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
   <link rel="preload" href={outfit800} as="font" type="font/woff2" crossorigin />
   <link rel="preload" href={inter400} as="font" type="font/woff2" crossorigin />
   <link rel="preload" href={plex500} as="font" type="font/woff2" crossorigin />
@@ -65,17 +85,22 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonicalUrl} />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={ogAlt} />
   <meta property="og:locale" content={site.locale} />
   {published && <meta property="article:published_time" content={published} />}
   {modified && <meta property="article:modified_time" content={modified} />}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@AfricaVTFuture" />
-  <meta name="twitter:creator" content="@AfricaVTFuture" />
+  <meta name="twitter:site" content={site.x.handle} />
+  <meta name="twitter:creator" content={site.x.handle} />
   <meta name="twitter:title" content={fullTitle} />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image:alt" content={ogAlt} />
   {channels.map((c) => <link rel="me" href={c.url} />)}
-  <script type="application/ld+json" set:html={JSON.stringify([org, webSite, ...jsonld])} />
+  <script type="application/ld+json" set:html={JSON.stringify(ld).replace(/</g, "\\u003c")} />
   {site.analytics.provider && site.analytics.src && (
     <script defer data-domain={site.analytics.domain} src={site.analytics.src}></script>
   )}
@@ -124,7 +149,7 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
         ))}
       </ul>
       <div class="footer-bottom">
-        <nav aria-label="Footer"><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/llms.txt">llms.txt</a><a href="/sitemap-index.xml">Sitemap</a></nav>
+        <nav aria-label="Footer"><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/rss.xml">RSS</a><a href="/llms.txt">llms.txt</a><a href="/sitemap.xml">Sitemap</a></nav>
         <p>© {new Date().getFullYear()} {site.name}</p>
       </div>
     </div>

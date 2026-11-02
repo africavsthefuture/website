@@ -49,7 +49,7 @@ const srcset = (arr: any[]) => arr.map((r, i) => `${r.src} ${heroW[i]}w`).join("
 const heroSizes = "(min-width: 900px) 58vw, 100vw";
 const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcloud", "bluesky", "youtube", "x", "mastodon"].includes(c.id));
 ---
-<Base title={`${site.name}: ${site.tagline}`} description={site.description} jsonld={[faqJsonLd]}>
+<Base title={`${site.name}: ${site.tagline}`} description={site.description} crumbs={false} jsonld={[{ "@context": "https://schema.org", "@type": "WebPage", "@id": `${site.url}/#webpage`, url: `${site.url}/`, name: `${site.name}: ${site.tagline}`, description: site.description, isPartOf: { "@id": `${site.url}/#website` }, about: { "@id": `${site.url}/#org` }, inLanguage: site.lang }]}>
   <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={srcset(heroAvif)} imagesizes={heroSizes} fetchpriority="high" />
   <section class="hero-brief has-art">
     <div class="hero-art">

@@ -6,7 +6,7 @@ import { site, utm } from "../site.config.mjs";
 const contactEmail: string | null = null;
 const ch = Object.fromEntries(site.channels.map((c) => [c.id, c]));
 ---
-<Base title="Contact" description="How to reach Africa vs The Future: reply to the Substack brief or message us on Bluesky or X.">
+<Base title="Contact Africa vs The Future" crumbs={[{ name: "Contact", path: "/contact" }]} description="How to reach Africa vs The Future: reply to the Substack brief or message us on Bluesky or X.">
   <div class="wrap">
     <header class="page-head"><p class="eyebrow">Contact</p><h1>Talk to us.</h1>
       <p class="lede">Ideas, corrections, partnerships or press: these are the quickest routes today.</p></header>

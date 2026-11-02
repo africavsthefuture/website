@@ -1,0 +1,65 @@
+---
+import { Picture } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import SubscribeForm from "../../components/SubscribeForm.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import KeyFacts from "../../components/KeyFacts.astro";
+import { episodes, articles, img, coverImg, fmtDate, episodePath, clip, type Article } from "../../lib/content";
+import { podcastSeriesLd, episodeLd, toIsoDur } from "../../lib/podcast";
+import { site, utm } from "../../site.config.mjs";
+
+export function getStaticPaths() {
+  return episodes.map((e) => ({ params: { slug: e.slug }, props: { e } }));
+}
+const { e } = Astro.props as { e: any };
+const pageUrl = `${site.url}${episodePath(e)}`;
+const remote = img(e.image);
+const cover = remote ?? coverImg(`episode-${e.slug}`);
+const ogImage = `/og/episodes/${e.slug}.jpg`;
+const n = episodes.length - episodes.indexOf(e);
+// Essays that share words with the episode's own title and description.
+const words = new Set(`${e.title} ${e.excerpt}`.toLowerCase().split(/[^a-z]+/).filter((w: string) => w.length > 4));
+const score = (a: Article) => `${a.title} ${a.subtitle ?? ""} ${a.excerpt}`.toLowerCase().split(/[^a-z]+/).filter((w) => words.has(w)).length;
+const related = [...articles].sort((a, b) => score(b) - score(a) || +new Date(b.published) - +new Date(a.published)).slice(0, 3);
+const desc = clip(`${e.excerpt} Episode ${n} of the free ${site.name} Community podcast.`);
+const facts = [
+  { k: "Published", v: fmtDate(e.published) },
+  ...(e.duration ? [{ k: "Length", v: e.duration.replace(/^00:/, "") }] : []),
+  { k: "Series", v: `<a href="/podcast">${site.name} Community podcast</a>` },
+  { k: "Listen on", v: `<a href="${utm(e.url, "listen", "episode_facts")}">SoundCloud ↗</a>` },
+];
+const ld = [{ ...episodeLd(e, n), "@context": "https://schema.org" }, podcastSeriesLd()];
+---
+<Base title={e.title} description={desc} type="article" image={ogImage} imageAlt={`${e.title}: ${site.name} podcast episode`} published={e.published} jsonld={ld}
+  crumbs={[{ name: "Podcast", path: "/podcast" }, { name: e.title, path: episodePath(e) }]}>
+  <div class="wrap" style="padding-top:2rem">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/podcast">Podcast</a> / <span aria-current="page">Episode {String(n).padStart(3, "0")}</span></nav>
+    <div class="summary-grid">
+      <article class="essay">
+        <p class="eyebrow">Podcast · Community · Episode {n}{e.duration && ` · ${e.duration.replace(/^00:/, "")}`}</p>
+        <h1 class="essay-title">{e.title}</h1>
+        <p class="byline"><span>From <strong>{site.name}</strong></span><span>Published <time datetime={e.published}><strong>{fmtDate(e.published)}</strong></time></span></p>
+        <section class="answer-box" aria-labelledby="ep-brief">
+          <h2 id="ep-brief" class="eyebrow">About this episode</h2>
+          <p class="answer-summary">{e.excerpt}</p>
+        </section>
+        {cover && <div class="summary-hero" style="max-width:420px"><Picture src={cover} formats={["avif"]} fallbackFormat="webp" widths={[320, 640]} sizes="(min-width: 600px) 420px, 100vw" alt={remote ? `Episode artwork for “${e.title}”` : `Abstract teal-and-gold cover for “${e.title}”`} loading="eager" /></div>}
+        {e.audio && <p><audio controls preload="none" src={e.audio}><a href={e.url}>Listen on SoundCloud</a></audio></p>}
+        <p class="also-on">Also on <a href={utm(e.url, "listen", "episode_page")} rel="noopener">SoundCloud ↗</a></p>
+        <div class="band essay-signup">
+          <div>
+            <h2>Get new episodes by email.</h2>
+            <p>Free, from {site.name}. Every essay and episode as it's released.</p>
+          </div>
+          <SubscribeForm placement={`episode_${e.slug}`.slice(0, 60)} id="email-episode" />
+        </div>
+      </article>
+      <aside><KeyFacts facts={facts} title="Episode details" /></aside>
+    </div>
+    <section class="section" aria-labelledby="ep-read">
+      <h2 id="ep-read" class="section-title" style="margin-bottom:1.5rem">Read the related essays</h2>
+      <div class="grid grid-3">{related.map((r) => <ArticleCard a={r} />)}</div>
+      <p style="margin-top:1.5rem"><a class="text-link" href="/podcast">All {site.name} podcast episodes →</a></p>
+    </section>
+  </div>
+</Base>

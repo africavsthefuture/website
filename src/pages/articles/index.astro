@@ -11,7 +11,7 @@ const list = {
 };
 const [first, ...others] = articles;
 ---
-<Base title="Articles: essays on Africa's future" description="Every Africa vs The Future essay, in full: copper, beneficiation, defence, EVs, AI and self-determination. A critical, progressive look at Africa's future." jsonld={[list]}>
+<Base title="Articles: essays on Africa's future" description="Every Africa vs The Future essay, in full: copper, beneficiation, defence, EVs, AI and self-determination. A critical, progressive look at Africa's future." jsonld={[list]} crumbs={[{ name: "Articles", path: "/articles" }]}>
   <div class="wrap">
     <header class="page-head">
       <p class="eyebrow">Articles</p>
@@ -19,9 +19,11 @@ const [first, ...others] = articles;
       <p class="lede">{articles.length} essays newest first, also published on Medium and Substack. Read every one in full here.</p>
       <SubscribeForm placement="articles_head" />
     </header>
+    <h2 class="section-title" style="font-size:1.6rem;margin:0 0 1rem">Latest essay</h2>
     <div class="feature-grid" style="grid-template-columns:1fr">
       <ArticleCard a={first} big eager />
     </div>
+    {others.length > 0 && <h2 class="section-title" style="font-size:1.6rem;margin:2rem 0 1rem">All essays, newest first</h2>}
     <div class="grid grid-3" style="margin-top:1.25rem">{others.map((a) => <ArticleCard a={a} />)}</div>
     <AdSlot kind="inline" id="articles-inline-1" />
   </div>

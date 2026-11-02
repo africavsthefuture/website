@@ -6,7 +6,7 @@ import BriefingOffer from "../../components/BriefingOffer.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import KeyFacts from "../../components/KeyFacts.astro";
-import { articles, img, coverImg, fmtDate, platformLabel, type Article } from "../../lib/content";
+import { articles, img, coverImg, fmtDate, platformLabel, keyPointsFor, describe, relatedTo, lastmodOf, type Article } from "../../lib/content";
 import { topicOf } from "../../lib/cover.mjs";
 import { site, utm } from "../../site.config.mjs";
 
@@ -20,24 +20,32 @@ const topic = topicOf(`${a.title} ${a.tags.join(" ")}`).label;
 const ogImage = `/og/articles/${a.slug}.jpg`;
 const pageUrl = `${site.url}/articles/${a.slug}`;
 const original = utm(a.url, "also_on", a.slug);
-const related = articles.filter((x) => x.slug !== a.slug).slice(0, 3);
+const related = relatedTo(a, topicOf, 3);
+const idx = articles.findIndex((x) => x.slug === a.slug);
+const newer = articles[idx - 1], older = articles[idx + 1];
 const hasBody = !!(a.body && a.body.length > 200);
 const mins = a.words ? Math.max(1, Math.round(a.words / 230)) : null;
-const desc = (a.subtitle || a.excerpt).slice(0, 155).replace(/\s\S*$/, "") + "…";
+const kp = keyPointsFor(a);
+const desc = describe(a);
+const isOrgAuthor = !a.author || a.author === site.name;
+const author = isOrgAuthor
+  ? { "@type": "Organization", "@id": `${site.url}/#org`, name: site.name, url: site.url }
+  : { "@type": "Person", name: a.author };
+const ogAlt = `${a.title}: ${site.name} essay cover`;
 const ld = [
   {
-    "@context": "https://schema.org", "@type": "Article", "@id": `${pageUrl}#article`, headline: a.title, description: a.subtitle || a.excerpt,
-    datePublished: a.published, ...(a.updated ? { dateModified: a.updated } : {}),
-    author: { "@type": "Organization", name: a.author, url: site.url },
-    publisher: { "@id": `${site.url}/#org` },
-    url: pageUrl, mainEntityOfPage: pageUrl, sameAs: [a.url], isAccessibleForFree: true,
+    "@context": "https://schema.org", "@type": "BlogPosting", "@id": `${pageUrl}#article`,
+    headline: a.title, ...(a.subtitle ? { alternativeHeadline: a.subtitle } : {}),
+    description: desc, abstract: kp.summary,
+    datePublished: a.published, dateModified: lastmodOf(a),
+    author,
+    publisher: { "@type": "Organization", "@id": `${site.url}/#org`, name: site.name, url: site.url, logo: { "@type": "ImageObject", url: `${site.url}${site.logoPath}`, width: 512, height: 512 } },
+    image: [{ "@type": "ImageObject", url: `${site.url}${ogImage}`, width: 1200, height: 630, caption: ogAlt }],
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    url: pageUrl, isPartOf: { "@id": `${site.url}/#website` }, sameAs: [a.url], isAccessibleForFree: true,
     ...(a.words ? { wordCount: a.words } : {}), inLanguage: site.lang,
-    image: `${site.url}${ogImage}`, about: topic, ...(a.tags.length ? { keywords: a.tags.join(", ") } : {}),
+    articleSection: topic, about: topic, ...(a.tags.length ? { keywords: a.tags.join(", ") } : {}),
   },
-  { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: site.url },
-    { "@type": "ListItem", position: 2, name: "Articles", item: `${site.url}/articles` },
-    { "@type": "ListItem", position: 3, name: a.title, item: pageUrl } ] },
 ];
 const facts = [
   { k: "Published", v: fmtDate(a.published) },
@@ -47,16 +55,25 @@ const facts = [
 ];
 ---
 <!-- Canonical is this page: the site is the home of every essay. Medium/Substack copies should point their canonical here. -->
-<Base title={a.title} description={desc} canonical={pageUrl} type="article" image={ogImage} published={a.published} modified={a.updated ?? undefined} jsonld={ld}>
+<Base title={a.title} description={desc} canonical={pageUrl} type="article" image={ogImage} imageAlt={ogAlt} published={a.published} modified={lastmodOf(a)} jsonld={ld} crumbs={[{ name: "Articles", path: "/articles" }, { name: a.title, path: `/articles/${a.slug}` }]}>
   <div class="wrap" style="padding-top:2rem">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles">Articles</a> / <span>{topic}</span></nav>
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/articles">Articles</a> / <span aria-current="page">{topic}</span></nav>
     <div class="summary-grid">
       <article class="essay">
         <p class="eyebrow">{topic} · Essay{mins && ` · ${mins} min read`}</p>
         <h1 class="essay-title">{a.title}</h1>
         {a.subtitle && <p class="lede">{a.subtitle}</p>}
-        <p class="byline"><span>By <strong>{a.author}</strong></span><span>Published <time datetime={a.published}><strong>{fmtDate(a.published)}</strong></time></span>{a.updated && <span>Updated <time datetime={a.updated}>{fmtDate(a.updated)}</time></span>}</p>
+        <p class="byline"><span>By <strong>{a.author}</strong></span><span>Published <time datetime={a.published}><strong>{fmtDate(a.published)}</strong></time></span>{a.updated && a.updated.slice(0, 10) !== a.published.slice(0, 10) && <span>Updated <time datetime={a.updated}>{fmtDate(a.updated)}</time></span>}</p>
         {i && <div class="summary-hero"><Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[480, 800, 1200]} sizes="(min-width: 1000px) 60vw, 100vw" alt={remote ? `Cover image for “${a.title}”` : `Abstract teal-and-gold ${topic.toLowerCase()} motif`} loading="eager" fetchpriority="high" /></div>}
+        <section class="answer-box" aria-labelledby="kp-title">
+          <h2 id="kp-title" class="eyebrow">In brief</h2>
+          <p class="answer-summary">{kp.summary}</p>
+          {kp.points.length > 0 && (<>
+            <h3 class="answer-sub">Key points</h3>
+            <ul>{kp.points.map((p) => <li>{p}</li>)}</ul>
+          </>)}
+          <p class="answer-note">{kp.curated ? "Quoted directly from the essay below." : "From the essay's own opening."}</p>
+        </section>
         {hasBody ? (
           <div class="prose essay-body" set:html={a.body} />
         ) : (
@@ -80,8 +97,13 @@ const facts = [
       </aside>
     </div>
     <section class="section" aria-labelledby="more-title">
-      <h2 id="more-title" class="section-title" style="margin-bottom:1.5rem">More essays</h2>
+      <h2 id="more-title" class="section-title" style="margin-bottom:1.5rem">Related essays</h2>
       <div class="grid grid-3">{related.map((r) => <ArticleCard a={r} />)}</div>
+      <nav class="essay-pager" aria-label="More essays">
+        {older && <p><span class="eyebrow">Previous essay</span><a class="text-link" href={`/articles/${older.slug}`}>{older.title}</a></p>}
+        {newer && <p><span class="eyebrow">Next essay</span><a class="text-link" href={`/articles/${newer.slug}`}>{newer.title}</a></p>}
+        <p><span class="eyebrow">Archive</span><a class="text-link" href="/articles">All {site.name} essays</a></p>
+      </nav>
     </section>
   </div>
 </Base>

@@ -538,3 +538,20 @@ a:hover { color: var(--gold-bright); }
 .keyfacts dd { margin: 0; font-size: .92rem; color: var(--paper); }
 .keyfacts dd a { color: var(--gold-bright); }
 .summary-grid .keyfacts dl > div { grid-template-columns: 1fr; gap: .15rem; }
+
+/* ── Answer-first block on essays (AEO) ─────────────────────────────────── */
+.answer-box { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; margin: 1.5rem 0 2rem; }
+.answer-box h2.eyebrow { margin: 0 0 .5rem; font-size: .75rem; }
+.answer-summary { font-size: 1.05rem; line-height: 1.55; margin: 0 0 .75rem; color: var(--paper); }
+.answer-sub { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: .75rem 0 .4rem; }
+.answer-box ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .4rem; }
+.answer-box li { line-height: 1.5; }
+.answer-note { font-size: .8rem; color: var(--muted); margin: .75rem 0 0; }
+.essay-pager { display: grid; gap: .9rem; margin-top: 2rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+.essay-pager p { margin: 0; display: grid; gap: .25rem; }
+.entity-box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.25rem 1.4rem; margin: 2rem 0; }
+.entity-box dl { display: grid; grid-template-columns: 9rem 1fr; gap: .5rem 1rem; margin: .75rem 0 0; }
+.entity-box dt { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.entity-box dd { margin: 0; }
+@media (max-width: 560px) { .entity-box dl { grid-template-columns: 1fr; } .entity-box dd { margin-bottom: .5rem; } }
+.entity-channels { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem 1rem; }
