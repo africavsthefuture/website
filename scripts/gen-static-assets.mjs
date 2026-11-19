@@ -60,7 +60,8 @@ await sharp({ create: { width: 1200, height: 630, channels: 3, background: INK }
 const read = async (f) => JSON.parse(await fs.readFile(`src/data/${f}.json`, "utf8"));
 const articles = [...(await read("medium")), ...(await read("substack"))];
 const sc = await read("soundcloud");
-const gum = site.features.store ? (await read("gumroad")).filter((p) => site.features.miniBooks || p.kind !== "mini-book") : [];
+const approvedProducts = new Set(site.store?.approved ?? []);
+const gum = site.features.store ? (await read("gumroad")).filter((p) => site.features.miniBooks || p.kind !== "mini-book" || approvedProducts.has(p.permalink)) : [];
 for (const f of await fs.readdir("src/assets/covers")) if (f.startsWith("product-")) await fs.rm(`src/assets/covers/${f}`);
 
 const jobs = [];
@@ -104,9 +105,17 @@ for (const a of articles) {
   jobs.push(articleOg(a, text));
 }
 for (const [i, e] of (sc.episodes || []).entries())
-  jobs.push(sharp(Buffer.from(coverSvg({ seed: e.slug, text: `${e.title} ${e.excerpt}`, W: 1000, H: 1000, label: "Podcast", index: (sc.episodes.length - i) }))).png().toFile(`src/assets/covers/episode-${e.slug}.png`));
+  jobs.push(sharp(Buffer.from(coverSvg({ seed: e.slug, text: `${e.title} ${e.excerpt}`, W: 1000, H: 1000, label: "Podcast", index: e.number ?? (sc.episodes.length - i) }))).png().toFile(`src/assets/covers/episode-${e.slug}.png`));
 for (const p of gum)
   jobs.push(sharp(Buffer.from(coverSvg({ seed: p.slug, text: p.name, W: 1000, H: 1000, label: p.kind === "podcast" ? "Thought Leaders · Podcast" : "Thought Leaders", index: p.issue ?? undefined }))).png().toFile(`src/assets/covers/product-${p.slug}.png`));
+// Product OG cards (1200x630): the screened Gumroad image on the ink ground, else the generated cover.
+await fs.mkdir("public/og/store", { recursive: true });
+for (const f of await fs.readdir("public/og/store")) await fs.rm(`public/og/store/${f}`);
+for (const p of gum) {
+  const src = p.image ? `src/assets/remote/${p.image}` : null;
+  const inner = src ? await sharp(src).resize(1200, 630, { fit: "contain", background: INK }).toBuffer() : null;
+  if (inner) jobs.push(sharp(inner).jpeg({ quality: 85, mozjpeg: true }).toFile(`public/og/store/${p.slug}.jpg`));
+}
 jobs.push(sharp(Buffer.from(coverSvg({ seed: "about", text: "strategy", W: 1000, H: 1000, label: "Africa vs The Future" }))).png().toFile("src/assets/covers/about.png"));
 await Promise.all(jobs);
 // Episode OG cards: screened episode artwork (or the generated cover) + title. Runs after covers exist.

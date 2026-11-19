@@ -1,11 +1,11 @@
 {
- "builtAt": "2026-11-02T03:43:31.378Z",
+ "builtAt": "2026-11-19T18:43:51.220Z",
  "report": {
-  "medium": "live (5)",
-  "substack": "live (3)",
+  "medium": "CACHE from 2026-11-19T18:43:21.975Z (OFFLINE=1)",
+  "substack": "CACHE from 2026-11-19T18:43:28.886Z (OFFLINE=1)",
   "youtube": "skipped (features.youtube=false)",
-  "soundcloud": "live (1)",
-  "bluesky": "live (6)",
-  "gumroad": "live (12)"
+  "soundcloud": "CACHE from 2026-11-19T18:43:31.397Z (OFFLINE=1)",
+  "bluesky": "CACHE from 2026-11-19T18:43:31.521Z (OFFLINE=1)",
+  "gumroad": "CACHE from 2026-11-19T18:43:33.338Z (OFFLINE=1)"
  }
 }

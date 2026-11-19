@@ -12,6 +12,7 @@ import { site } from "../src/site.config.mjs";
 import sanitizeHtml from "sanitize-html";
 import sharp from "sharp";
 import { policyFor, usable, coverOverride } from "../src/data/image-policy.mjs";
+import { episodeOverrides } from "../src/data/episode-overrides.mjs";
 const PUB_IMG = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "public/essay-img");
 
 // Full article body for on-site reading. Inline images/figures/embeds are removed on
@@ -48,7 +49,12 @@ const OFFLINE = process.env.OFFLINE === "1";
 const UA = "Mozilla/5.0 (compatible; AvtF-site-builder/1.0; +https://www.africavsthefuture.xyz)";
 const xml = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_", cdataPropName: false });
 
-async function get(url, { timeout = 12000, type = "text" } = {}) {
+// One retry on network errors/timeouts (feeds occasionally stall).
+async function get(url, opts = {}) {
+  try { return await get1(url, opts); }
+  catch (e) { if (/^4\d\d /.test(e.message)) throw e; await new Promise((r) => setTimeout(r, 2000)); return get1(url, opts); }
+}
+async function get1(url, { timeout = 12000, type = "text" } = {}) {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), timeout);
   try {
@@ -220,21 +226,31 @@ async function youtube() {
   return out;
 }
 
+// SoundCloud: the public RSS feed lists every public track, so new uploads appear
+// automatically. Episode numbers come from the title ("001 …", "… - 001"), unless
+// src/data/episode-overrides.mjs sets one for that slug.
 async function soundcloud() {
-  const feed = xml.parse(await get(site.feeds.soundcloud));
+  const feed = xml.parse(await get(site.feeds.soundcloud, { timeout: 20000 }));
   const ch = feed.rss.channel;
   const out = [];
   for (const i of arr(ch.item)) {
     const img = i["itunes:image"]?.["@_href"];
+    const slug = String(txt(i.link)).split("/").pop();
+    let title = decode(txt(i.title)).replace(/\s+/g, " ").trim();
+    const m = title.match(/^(\d{1,3})\b/) || title.match(/-\s*(\d{3})\b/);
+    const ov = episodeOverrides[slug] || {};
+    const number = ov.number ?? (m ? +m[1] : null);
+    if (ov.number != null && m) title = title.replace(m[1], String(ov.number).padStart(3, "0"));
     out.push({
-      platform: "soundcloud", slug: String(txt(i.link)).split("/").pop(), title: decode(txt(i.title)),
+      platform: "soundcloud", slug, number, title,
       url: String(txt(i.link)), published: new Date(txt(i.pubDate)).toISOString(),
       duration: txt(i["itunes:duration"]) || null,
       audio: i.enclosure?.["@_url"] || null,
       excerpt: words(strip(txt(i.description) || txt(i["itunes:summary"])), 60),
-      image: await saveImage(img, `episode-${String(txt(i.link)).split("/").pop()}`), imageSrc: img || null,
+      image: await saveImage(img, `episode-${slug}`), imageSrc: img || null,
     });
   }
+  out.sort((a, b) => +new Date(b.published) - +new Date(a.published));
   return { show: { title: decode(txt(ch.title)), description: strip(txt(ch.description)), url: txt(ch.link) }, episodes: out };
 }
 
@@ -251,54 +267,65 @@ async function bluesky() {
     }));
 }
 
-// Gumroad: public storefront today. When GUMROAD_ACCESS_TOKEN is set this
-// switches to the official API (GET https://api.gumroad.com/v2/products), the
-// same API media-studio's scripts/gumroad_publisher.py uses.
+// Gumroad: public storefront + each product page (both embed JSON in data-page).
+// No API token needed. Prices come from the product page: plain products use
+// price_cents; tiered memberships use their tiers' recurrence prices.
+const GUM = () => site.gumroad.store.replace(/\/$/, "");
+const pageJson = (html) => JSON.parse(decode(html.match(/data-page="([^"]+)"/)[1]));
+const cleanName = (n = "") => n.replace(/\s+/g, " ").replace(/[\\"”]+\s*$/, "").trim();
+const paras = (h = "") => (String(h).match(/<p>[\s\S]*?<\/p>/gi) || []).map(strip).filter(Boolean);
 async function gumroad() {
-  const token = process.env.GUMROAD_ACCESS_TOKEN;
-  let products;
-  if (token) {
-    const j = await get(`https://api.gumroad.com/v2/products?access_token=${token}`, { type: "json" });
-    products = j.products.filter((p) => p.published).map((p) => ({
-      id: p.id, permalink: p.custom_permalink || p.short_url.split("/").pop(), name: p.name,
-      price_cents: p.price, currency: (p.currency || "gbp").toUpperCase(), url: p.short_url,
-      thumbnail: p.thumbnail_url, description: strip(p.description || ""), native_type: null, source: "api",
-    }));
-  } else {
-    const html = await get(site.gumroad.store);
-    const page = JSON.parse(decode(html.match(/data-page="([^"]+)"/)[1]));
-    const found = new Map();
-    const walk = (o) => {
-      if (Array.isArray(o)) return o.forEach(walk);
-      if (o && typeof o === "object") {
-        if ("price_cents" in o && o.permalink && o.name) found.set(o.permalink, o);
-        Object.values(o).forEach(walk);
-      }
-    };
-    walk(page.props);
-    products = [];
-    for (const p of found.values()) {
-      let description = "", summary = "";
-      try {
-        const ph = await get(`${site.gumroad.store.replace(/\/$/, "")}/l/${p.permalink}`);
-        const pp = JSON.parse(decode(ph.match(/data-page="([^"]+)"/)[1])).props.product || {};
-        description = strip(pp.description_html || ""); summary = pp.summary || "";
-      } catch (e) { console.warn("  gumroad product page failed:", p.permalink, e.message); }
-      products.push({
-        id: p.id, permalink: p.permalink, name: p.name.replace(/\s+/g, " ").trim(), price_cents: p.price_cents,
-        currency: (p.currency_code || "gbp").toUpperCase(), url: `${site.gumroad.store.replace(/\/$/, "")}/l/${p.permalink}`,
-        thumbnail: p.thumbnail_url, description, summary, native_type: p.native_type, source: "storefront",
-      });
+  const page = pageJson(await get(site.gumroad.store, { timeout: 20000 }));
+  const found = new Map();
+  const walk = (o) => {
+    if (Array.isArray(o)) return o.forEach(walk);
+    if (o && typeof o === "object") {
+      if ("price_cents" in o && o.permalink && o.name) found.set(o.permalink, o);
+      Object.values(o).forEach(walk);
     }
+  };
+  walk(page.props);
+  const products = [];
+  for (const p of found.values()) {
+    const pp = pageJson(await get(`${GUM()}/l/${p.permalink}`, { timeout: 20000 })).props.product || {};
+    const currency = (pp.currency_code || p.currency_code || "gbp").toUpperCase();
+    let price_cents = pp.price_cents ?? p.price_cents, recurrence = null, tiers = [];
+    if (pp.is_tiered_membership || pp.is_recurring_billing) {
+      recurrence = pp.recurrences?.default || p.recurrence || "monthly";
+      tiers = (pp.options || []).map((o) => ({ name: cleanName(o.name), price_cents: o.recurrence_price_values?.[recurrence]?.price_cents ?? null, pwyw: !!o.is_pwyw }))
+        .filter((t) => t.price_cents != null);
+      if (tiers.length) price_cents = Math.min(...tiers.map((t) => t.price_cents));
+    }
+    const covers = pp.covers || [];
+    const main = covers.find((c) => c.id === pp.main_cover_id) || covers[0];
+    // Candidate images in preference order; the first one passing image-policy is used.
+    const imageCandidates = [main?.original_url, ...covers.map((c) => c.original_url), pp.thumbnail_url || p.thumbnail_url].filter(Boolean);
+    products.push({
+      id: p.id, permalink: p.permalink, name: cleanName(pp.name || p.name),
+      price_cents, currency, recurrence, tiers, pwyw: !!(pp.is_pay_what_you_want || p.is_pay_what_you_want),
+      url: pp.long_url || `${GUM()}/l/${p.permalink}`,
+      thumbnail: pp.thumbnail_url || p.thumbnail_url, imageCandidates,
+      description: strip(pp.description_html || ""), paragraphs: paras(pp.description_html), summary: pp.summary || "",
+      attributes: (pp.attributes || []).map((x) => ({ name: x.name, value: x.value })),
+      refund: pp.refund_policy?.title || null,
+      native_type: pp.native_type || p.native_type, source: "storefront",
+    });
   }
   for (const p of products) {
     const m = p.name.match(/Issue\s+(\d+)/i), e = p.name.match(/Episode\s+(\d+)/i);
-    p.kind = /podcast/i.test(p.name) ? "podcast" : m ? "mini-book" : "bundle";
+    p.kind = /podcast/i.test(p.name) ? "podcast" : p.native_type === "membership" || p.recurrence ? "membership" : m ? "mini-book" : "bundle";
     p.issue = m ? +m[1] : e ? +e[1] : null;
     p.slug = p.kind === "mini-book" ? `issue-${p.issue}` : p.kind === "podcast" ? `episode-${p.issue}` : slugify(p.name.replace(/^Africa vs The Future\s*-\s*/i, "")) || p.permalink;
-    p.image = await saveImage(p.thumbnail);
+    p.image = null; p.imageSrc = null;
+    for (const u of p.imageCandidates) {
+      if (!usable(policyFor(u))) continue;
+      p.image = await saveImage(u, `product-${p.slug}`);
+      if (p.image) { p.imageSrc = u; break; }
+    }
+    delete p.imageCandidates;
   }
-  return products.sort((a, b) => (a.kind > b.kind ? 1 : a.kind < b.kind ? -1 : (a.issue ?? 0) - (b.issue ?? 0)));
+  const order = { "mini-book": 0, podcast: 1, membership: 2, bundle: 3 };
+  return products.sort((a, b) => order[a.kind] - order[b.kind] || (a.issue ?? 0) - (b.issue ?? 0));
 }
 
 // ---------- runner ----------

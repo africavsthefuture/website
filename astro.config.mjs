@@ -27,7 +27,7 @@ export default defineConfig({
   compressHTML: true,
   redirects: { "/thought-leaders": "/#subscribe" },
   integrations: [sitemap({
-    filter: (p) => !p.includes("/404") && !p.includes("thought-leaders"),
+    filter: (p) => !p.includes("/404") && !/\/thought-leaders\/?$/.test(p),
     serialize(item) {
       const url = item.url.replace(/\/$/, "") || item.url;
       const key = url === SITE ? `${SITE}/` : url;

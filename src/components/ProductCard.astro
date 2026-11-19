@@ -1,19 +1,21 @@
 ---
 import { Picture } from "astro:assets";
-import { img, coverImg, price, productPath, displayName, type Product } from "../lib/content";
+import { img, coverImg, priceLabel, productPath, displayName, kindLabel, type Product } from "../lib/content";
 const { p } = Astro.props as { p: Product };
-const i = img(p.image) ?? coverImg(`product-${p.slug}`);
+const remote = img(p.image);
+const i = remote ?? coverImg(`product-${p.slug}`);
+const name = displayName(p);
 ---
 <article class="card product-card">
   <a href={productPath(p)} class="card-link">
     <div class="card-media square">
-      {i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[300, 500]} sizes="(min-width: 900px) 22vw, 50vw" alt={`Generated cover for ${displayName(p)}, Africa vs The Future Thought Leaders`} loading="lazy" />
+      {i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[300, 500]} sizes="(min-width: 900px) 30vw, 90vw" alt={remote ? `Gumroad artwork for ${name}, Thought Leaders` : `Generated cover for ${name}, Thought Leaders`} loading="lazy" />
          : <div class="card-media-fallback" aria-hidden="true">VS</div>}
-      <span class="chip chip-gold">{p.kind === "mini-book" ? "Mini-book" : p.kind === "podcast" ? "Podcast" : "Bundle"}</span>
+      <span class="chip chip-gold">{kindLabel(p)}</span>
     </div>
     <div class="card-body">
-      <h3 class="card-title">{displayName(p)}</h3>
-      <p class="price">{price(p.price_cents, p.currency)}</p>
+      <h3 class="card-title">{name}</h3>
+      <p class="price">{priceLabel(p)}</p>
     </div>
   </a>
 </article>

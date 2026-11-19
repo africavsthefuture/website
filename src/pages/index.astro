@@ -10,7 +10,8 @@ import KeyFacts from "../components/KeyFacts.astro";
 import BriefingOffer from "../components/BriefingOffer.astro";
 import ChannelIcon from "../components/ChannelIcon.astro";
 import { site, utm, liveChannels } from "../site.config.mjs";
-import { articles, episodes, posts, products, img, coverImg, price, fmtDate } from "../lib/content";
+import { articles, episodes, posts, products, img, coverImg, price, priceLabel, displayName, shortName, productPath, fmtDate } from "../lib/content";
+import tlLogo from "../assets/brand/tl-logo.png";
 import { topicOf } from "../lib/cover.mjs";
 import { faq, faqJsonLd } from "../lib/faq";
 import community from "../assets/brand/community-hero.jpg";
@@ -20,7 +21,8 @@ const [lead, ...rest] = articles;
 const side = rest.slice(0, 2), more = rest.slice(2, 5);
 const storeOn = site.features.store;
 const tlPods = products.filter((p) => p.kind === "podcast");
-const bundle = products.find((p) => p.kind === "bundle");
+const tlBooks = products.filter((p) => p.kind === "mini-book");
+const bundle = products.find((p) => p.kind === "membership" || p.kind === "bundle");
 const storeItems = products.slice(0, 4);
 const ep = episodes[0];
 const topicFor = (a: any) => topicOf(`${a.title} ${(a.tags || []).join(" ")}`).label;
@@ -162,12 +164,13 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
           <h3>The deeper analysis.</h3>
           <ul>
             <li><div><b>Substack paid edition</b><span>The full analysis behind the free posts</span></div></li>
+            {storeOn && tlBooks.length > 0 && <li><div><b>Thought Leaders mini-books</b><span>{tlBooks.length} referenced issue{tlBooks.length === 1 ? "" : "s"} on Gumroad</span></div></li>}
             {storeOn && tlPods.length > 0 && <li><div><b>Thought Leaders podcast</b><span>{tlPods.length} deep-dive episode{tlPods.length === 1 ? "" : "s"} on Gumroad</span></div></li>}
           </ul>
           <p class="tier-note">An optional paid edition on Substack. Everything in Community stays free.</p>
           <div class="btns">
-            {storeOn && <a class="btn btn-ghost" href="/store">Browse the store</a>}
-            {storeOn && bundle && <a class="btn btn-ghost" href={`/store/bundles/${bundle.slug}`}>Series bundle · {price(bundle.price_cents, bundle.currency)}</a>}
+            {storeOn && <a class="btn btn-ghost" href="/store">Thought Leaders store</a>}
+            {storeOn && bundle && <a class="btn btn-ghost" href={productPath(bundle)}>Membership · {priceLabel(bundle)}</a>}
           </div>
         </div>
       </div>
@@ -197,13 +200,13 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
   </section>)}
 
   {storeOn && storeItems.length > 0 && (
-  <section class="section" aria-labelledby="store-title">
+  <section class="section" aria-labelledby="store-title" style="padding-top:0">
     <div class="wrap">
-      <div class="section-head">
-        <div><span class="section-num">Own</span><h2 id="store-title" class="section-title">Latest from the store</h2></div>
-        <a class="text-link" href="/store">All products →</a>
+      <div class="store-teaser">
+        <Picture src={tlLogo} formats={["avif"]} fallbackFormat="webp" widths={[64, 128]} sizes="64px" alt="Thought Leaders logo" loading="lazy" />
+        <div><h2 id="store-title">Thought Leaders</h2><p>The optional paid series: {storeItems.map((p) => `${shortName(p)} (${priceLabel(p)})`).join("; ")}.</p></div>
+        <a class="btn btn-ghost btn-sm" href="/store">See Thought Leaders</a>
       </div>
-      <div class="grid grid-4">{storeItems.map((p) => <ProductCard p={p} />)}</div>
     </div>
   </section>)}
 

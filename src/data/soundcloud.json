@@ -7,8 +7,22 @@
  "episodes": [
   {
    "platform": "soundcloud",
+   "slug": "vendors-vs-economics",
+   "number": 2,
+   "title": "002 Africa vs The Future Community Podcast | Vendors vs Economics",
+   "url": "https://soundcloud.com/africa-vs-the-future-podcast/vendors-vs-economics",
+   "published": "2026-11-12T06:25:38.000Z",
+   "duration": "00:22:51",
+   "audio": "https://feeds.soundcloud.com/stream/2436507489-africa-vs-the-future-podcast-vendors-vs-economics.mp3",
+   "excerpt": "Overnight, hundreds of market stalls come down. By morning the traders have no income and nowhere to go. One of them asks, \"What about us?\" Across African cities, street vending keeps families fed. It also blocks pavements, crowds bus stops and undercuts the formal shops behind it. So which should a city put first, livelihoods or order? In this episode…",
+   "image": "episode-vendors-vs-economics.jpg",
+   "imageSrc": "https://i1.sndcdn.com/artworks-k7qG8VEw8dIapy5w-H8hEXg-t3000x3000.jpg"
+  },
+  {
+   "platform": "soundcloud",
    "slug": "africa-vs-future-community",
-   "title": "Africa vs Future Community Podcast - 001",
+   "number": 1,
+   "title": "001 Africa vs Future Community Podcast | The lingua franca conundrum",
    "url": "https://soundcloud.com/africa-vs-the-future-podcast/africa-vs-future-community",
    "published": "2026-04-13T09:56:18.000Z",
    "duration": "00:12:42",

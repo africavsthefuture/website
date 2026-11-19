@@ -4,43 +4,72 @@ import { Picture } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import SubscribeForm from "./SubscribeForm.astro";
 import ProductCard from "./ProductCard.astro";
-import { img, coverImg, price, displayName, usableDescription, products, productPath, type Product } from "../lib/content";
+import KeyFacts from "./KeyFacts.astro";
+import { img, coverImg, price, priceLabel, shortName, displayName, kindLabel, productParagraphs, productSummary, products, productPath, type Product } from "../lib/content";
 import { site, utm } from "../site.config.mjs";
 const { p } = Astro.props as { p: Product };
-const i = img(p.image) ?? coverImg(`product-${p.slug}`);
+const brand = site.store.brand;
+const remote = img(p.image);
+const i = remote ?? coverImg(`product-${p.slug}`);
 const name = displayName(p);
-const desc = usableDescription(p);
+const summary = productSummary(p);
+const paras = productParagraphs(p).filter((t) => t !== summary);
+// Group "• item" paragraphs into lists; skip a paragraph that repeats the summary.
+const blocks: { p?: string; list?: string[] }[] = [];
+for (const t of paras) {
+  if (/^[•·-]\s*/.test(t)) { const item = t.replace(/^[•·-]\s*/, ""); const last = blocks.at(-1); last?.list ? last.list.push(item) : blocks.push({ list: [item] }); }
+  else blocks.push({ p: t });
+}
 const buy = utm(p.url, "store", `buy_${p.slug}`);
-const typeLabel = p.kind === "mini-book" ? "Mini-book" : p.kind === "podcast" ? "Podcast deep-dive" : "Series bundle";
-const offer = { "@type": "Offer", price: (p.price_cents / 100).toFixed(2), priceCurrency: p.currency, url: p.url, availability: "https://schema.org/InStock", seller: { "@id": `${site.url}/#org` } };
+const pageUrl = `${site.url}${productPath(p)}`;
+const ogPath = p.image ? `/og/store/${p.slug}.jpg` : undefined;
+const amount = (p.price_cents / 100).toFixed(2);
+const offer: any = {
+  "@type": "Offer", price: amount, priceCurrency: p.currency, url: p.url,
+  availability: "https://schema.org/InStock", seller: { "@id": `${site.url}/#org` },
+  ...(p.recurrence ? { priceSpecification: { "@type": "UnitPriceSpecification", price: amount, priceCurrency: p.currency, billingDuration: "P1M", unitCode: "MON", referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode: "MON" } } } : {}),
+};
+const typeLd = p.kind === "mini-book" ? ["Product", "Book"] : "Product";
 const ld: any[] = [{
-  "@context": "https://schema.org", "@type": p.kind === "mini-book" ? ["Product", "Book"] : "Product",
-  name: p.name, url: `${site.url}${productPath(p)}`, sku: p.permalink, brand: { "@type": "Brand", name: site.name },
-  ...(desc ? { description: desc } : { description: `${typeLabel} from the Africa vs The Future Thought Leaders Series.` }),
-  ...(p.thumbnail ? { image: p.thumbnail } : {}),
-  ...(p.kind === "mini-book" ? { bookFormat: "https://schema.org/EBook", author: { "@id": `${site.url}/#org` }, isPartOf: { "@type": "BookSeries", name: "Africa vs The Future: Thought Leaders Series" }, position: p.issue } : {}),
+  "@context": "https://schema.org", "@type": typeLd,
+  name: p.name, url: pageUrl, sku: p.permalink, brand: { "@type": "Brand", name: brand },
+  manufacturer: { "@id": `${site.url}/#org` },
+  description: summary || `${kindLabel(p)} from ${brand}.`,
+  ...(ogPath ? { image: `${site.url}${ogPath}` } : {}),
+  ...(p.kind === "mini-book" ? { bookFormat: "https://schema.org/EBook", author: { "@id": `${site.url}/#org` }, isPartOf: { "@type": "BookSeries", name: `${site.name}: ${brand} Series` }, position: p.issue } : {}),
   offers: offer,
-}, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
-  { "@type": "ListItem", position: 1, name: "Home", item: site.url },
-  { "@type": "ListItem", position: 2, name: "Store", item: `${site.url}/store` },
-  { "@type": "ListItem", position: 3, name } ] }];
-const others = products.filter((x) => x.id !== p.id && x.kind === p.kind).slice(0, 4);
+}];
+const facts = [
+  { k: "Type", v: kindLabel(p) },
+  { k: "Price", v: priceLabel(p) + (p.tiers && p.tiers.length === 1 ? " (one tier)" : "") },
+  ...(p.attributes ?? []).map((a) => ({ k: a.name, v: a.value })),
+  ...(p.refund ? [{ k: "Refunds", v: p.refund }] : []),
+  { k: "Sold by", v: `${site.name} on Gumroad` },
+];
+const others = products.filter((x) => x.id !== p.id).slice(0, 3);
+const metaDesc = `${kindLabel(p)}, ${priceLabel(p)} on Gumroad. ${summary}`.replace(/\s+/g, " ").trim();
 ---
-<Base title={`${name}: Thought Leaders Series`} description={desc ? desc.slice(0, 150) : `${typeLabel} in the Africa vs The Future Thought Leaders Series. ${price(p.price_cents, p.currency)} on Gumroad.`} type="product" image={p.thumbnail} jsonld={ld}>
+<Base title={`${shortName(p)} | ${brand}`} description={metaDesc.length > 160 ? metaDesc.slice(0, 157).replace(/\s+\S*$/, "") + "…" : metaDesc} type="product" image={ogPath} imageAlt={`${name}: ${brand}`} jsonld={ld}
+  crumbs={[{ name: brand, path: "/store" }, { name, path: productPath(p) }]}>
   <div class="wrap" style="padding-top:2rem">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/store">Store</a> / <span>{name}</span></nav>
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/store">{brand}</a> / <span>{name}</span></nav>
     <div class="product-grid">
-      <div class="product-cover">{i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[320, 420, 840]} sizes="(min-width: 900px) 420px, 90vw" alt={`Generated cover for ${name}`} loading="eager" fetchpriority="high" /> : <div class="card-media-fallback">VS</div>}</div>
-      <div>
-        <p class="eyebrow">{typeLabel} · Thought Leaders Series</p>
-        <h1 style="font-size:clamp(2.2rem,5vw,3.8rem)">{name}</h1>
-        <p class="meta" style="margin-bottom:1rem">Listed on Gumroad as “{p.name}”</p>
-        {desc && <p class="lede">{desc}</p>}
-        <p class="price" style="font-size:2rem;margin:1rem 0">{price(p.price_cents, p.currency)}</p>
-        <p><a class="btn btn-gold" href={buy} rel="noopener">Buy on Gumroad ↗</a></p>
-        <div style="margin-top:2.5rem"><SubscribeForm placement={`product_${p.slug}`} heading="Not ready to buy? Get the free brief." /></div>
+      <div class="product-cover">{i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[400, 640, 1000]} sizes="(min-width: 900px) 560px, 92vw" alt={remote ? `Gumroad artwork for ${name}, ${brand}` : `Generated cover for ${name}, ${brand}`} loading="eager" fetchpriority="high" /> : <div class="card-media-fallback">VS</div>}</div>
+      <div class="product-detail">
+        <p class="eyebrow">{kindLabel(p)} · {brand}</p>
+        <h1>{name}</h1>
+        {summary && <p class="lede">{summary}</p>}
+        <p class="price">{priceLabel(p)}</p>
+        <div class="product-buy">
+          <a class="btn btn-gold" href={buy} rel="noopener">{p.recurrence ? "Join on Gumroad ↗" : "Buy on Gumroad ↗"}</a>
+          <a class="btn btn-ghost" href="/store">All {brand}</a>
+        </div>
+        <p class="product-note">Checkout, payment and delivery are handled by Gumroad.{p.currency !== "GBP" && ` Listed in ${p.currency}; Gumroad may show your local currency at checkout.`}{p.recurrence && " Billed monthly until cancelled on Gumroad."}</p>
+        <div class="prose" style="margin-top:1.75rem">{blocks.map((b) => b.list ? <ul>{b.list.map((t) => <li>{t}</li>)}</ul> : <p>{b.p}</p>)}</div>
+        <div style="margin-top:1.75rem"><KeyFacts facts={facts} title="Details" /></div>
       </div>
     </div>
-    {others.length > 0 && <section class="section"><h2 class="section-title" style="font-size:2rem;margin-bottom:1rem">More in the series</h2><div class="grid grid-4">{others.map((o) => <ProductCard p={o} />)}</div></section>}
+    {others.length > 0 && <section class="section" aria-labelledby="more-tl"><h2 id="more-tl" class="section-title" style="font-size:1.6rem;margin-bottom:1rem">More from {brand}</h2><div class="grid grid-3">{others.map((o) => <ProductCard p={o} />)}</div></section>}
+    <section class="section"><div class="two-col"><div><h2 class="section-title" style="font-size:1.6rem">Free articles by email</h2><p class="lede">New articles and podcast episodes, free in your inbox.</p></div><SubscribeForm placement={`product_${p.slug}`} /></div></section>
   </div>
 </Base>

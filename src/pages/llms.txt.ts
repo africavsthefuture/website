@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { site, liveChannels } from "../site.config.mjs";
-import { articles, episodes, products, productPath, displayName, price, fmtDate, platformLabel, keyPointsFor, episodePath } from "../lib/content";
+import { articles, episodes, products, productPath, displayName, priceLabel, productSummary, kindLabel, fmtDate, platformLabel, keyPointsFor, episodePath } from "../lib/content";
 import { topicOf } from "../lib/cover.mjs";
 import { faq } from "../lib/faq";
 // llms.txt (https://llmstxt.org): a plain-markdown map of the site for AI answer engines.
@@ -15,6 +15,7 @@ export const GET: APIRoute = () => {
     `- [Home](${site.url}/): latest articles and the email sign-up`,
     `- [Articles](${site.url}/articles): every article, newest first`,
     `- [Podcast](${site.url}/podcast): the free Community podcast`,
+    ...(site.features.store ? [`- [${site.store.brand}](${site.url}/store): the paid series (mini-book, podcast episode, membership) on Gumroad`] : []),
     `- [About](${site.url}/about): who ${site.shortName} is, its stance and official channels`,
     `- [${site.briefing.title}](${site.url}${site.briefing.path}): free guide, ${site.briefing.status === "live" ? "available to subscribers" : "coming soon"}`,
     `- [Full text of every article](${site.url}/llms-full.txt)`,
@@ -31,8 +32,8 @@ export const GET: APIRoute = () => {
   L.push("## Podcast episodes", "");
   episodes.forEach((e) => L.push(`- [${e.title}](${site.url}${episodePath(e)}): ${fmtDate(e.published)}${e.duration ? `, ${e.duration}` : ""}. ${e.excerpt} Audio: ${e.url}`));
   if (site.features.store && products.length) {
-    L.push("", "## Store (Gumroad)", `- [Store](${site.url}/store)`);
-    products.forEach((p) => L.push(`- [${displayName(p)}](${site.url}${productPath(p)}): ${price(p.price_cents, p.currency)}`));
+    L.push("", `## ${site.store.brand} (store, sold through Gumroad)`, `${site.store.brand} is the paid series from ${site.name}. Articles stay free; checkout is on Gumroad: ${site.gumroad.store}`, `- [${site.store.brand} store](${site.url}/store)`);
+    products.forEach((p) => L.push(`- [${displayName(p)}](${site.url}${productPath(p)}): ${kindLabel(p)}, ${priceLabel(p)}. ${productSummary(p)} Buy: ${p.url}`));
   }
   L.push("", "## FAQ", "");
   faq.forEach((f) => L.push(`### ${f.q}`, f.a, ""));

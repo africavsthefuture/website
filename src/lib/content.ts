@@ -5,6 +5,7 @@ import youtube from "../data/youtube.json";
 import soundcloud from "../data/soundcloud.json";
 import bluesky from "../data/bluesky.json";
 import gumroad from "../data/gumroad.json";
+import { productCopy } from "../data/product-copy.mjs";
 import report from "../data/build-report.json";
 
 const remote = import.meta.glob<{ default: ImageMetadata }>("../assets/remote/*", { eager: true });
@@ -68,23 +69,43 @@ export const buildReport = report as any;
 
 export type Product = {
   id: string; permalink: string; name: string; price_cents: number; currency: string; url: string;
-  description: string; summary?: string; kind: "mini-book" | "podcast" | "bundle"; issue: number | null;
-  slug: string; image?: string | null; thumbnail?: string;
+  description: string; paragraphs?: string[]; summary?: string; kind: "mini-book" | "podcast" | "membership" | "bundle"; issue: number | null;
+  slug: string; image?: string | null; imageSrc?: string | null; thumbnail?: string;
+  recurrence?: string | null; tiers?: { name: string; price_cents: number; pwyw: boolean }[]; pwyw?: boolean;
+  attributes?: { name: string; value: string }[]; refund?: string | null;
 };
 const allProducts = gumroad as Product[];
 // Products that may be shown, respecting feature flags (store off → none).
-export const products = site.features.store ? allProducts.filter((p) => site.features.miniBooks || p.kind !== "mini-book") : [];
+const approved = new Set<string>((site as any).store?.approved ?? []);
+export const products = site.features.store ? allProducts.filter((p) => site.features.miniBooks || p.kind !== "mini-book" || approved.has(p.permalink)) : [];
 export const productPath = (p: Product) =>
-  p.kind === "mini-book" ? `/store/mini-books/${p.slug}` : p.kind === "podcast" ? `/store/podcasts/${p.slug}` : `/store/bundles/${p.slug}`;
-export const displayName = (p: Product) =>
-  p.kind === "mini-book" ? `Mini-book · Issue ${p.issue}` : p.kind === "podcast"
-    ? p.name.replace(/^Africa vs The Future\s*-\s*Thought Leaders Podcast Series\s*-\s*/i, "").replace(/\\$/, "").trim()
-    : p.name.replace(/^Africa vs The Future\s*-\s*/i, "").trim();
-// Gumroad descriptions are often fragments (e.g. Issue 1 reads "This second issue of our Mini book series covers").
-// TODO(GUMROAD-COPY): write full descriptions in Gumroad. Until then only descriptions of 12+ words are shown.
-export const usableDescription = (p: Product) => (p.description && p.description.split(" ").length >= 12 ? p.description : "");
+  p.kind === "mini-book" ? `/store/mini-books/${p.slug}` : p.kind === "podcast" ? `/store/podcasts/${p.slug}` : p.kind === "membership" ? `/store/membership/${p.slug}` : `/store/bundles/${p.slug}`;
+export const displayName = (p: Product) => {
+  const n = p.name.replace(/^Africa vs The Future\s*-\s*/i, "").replace(/\\$/, "").trim();
+  if (p.kind === "podcast") return n.replace(/^Thought Leaders Podcast Series\s*-\s*/i, "").replace(/^(Episode \d+)\s*-\s*/i, "$1 · ");
+  if (p.kind === "mini-book") return n.replace(/^Thought Leaders\s+/i, "");
+  return n;
+};
+// Shorter name for <title>: podcast episode names drop their long subtitle after the colon.
+export const shortName = (p: Product) => (p.kind === "podcast" ? displayName(p).split(": ")[0] : displayName(p));
+export const kindLabel = (p: Product) =>
+  ({ "mini-book": "Mini-book", podcast: "Podcast episode", membership: "Monthly membership", bundle: "Bundle" } as any)[p.kind];
+// Calm, site-specific copy for products whose Gumroad description doesn't fit the
+// site's copy rules (src/data/product-copy.mjs). Otherwise the Gumroad text is used.
+export const productParagraphs = (p: Product): string[] => {
+  const c = (productCopy as any)[p.permalink];
+  if (c?.paragraphs) return c.paragraphs;
+  return (p.paragraphs ?? (p.description ? [p.description] : [])).filter((x) => !/^(Price:|More from the series)/i.test(x));
+};
+export const productSummary = (p: Product): string => {
+  const c = (productCopy as any)[p.permalink];
+  return c?.summary || p.summary || productParagraphs(p)[0] || "";
+};
+export const usableDescription = (p: Product) => productSummary(p);
 export const price = (cents: number, cur = "GBP") =>
   new Intl.NumberFormat("en-GB", { style: "currency", currency: cur }).format(cents / 100);
+const per = (r?: string | null) => (r ? ({ monthly: "month", yearly: "year", quarterly: "quarter", biannually: "6 months" } as any)[r] ?? r : "");
+export const priceLabel = (p: Product) => `${p.pwyw ? "From " : ""}${price(p.price_cents, p.currency)}${p.recurrence ? ` / ${per(p.recurrence)}` : ""}`;
 
 export const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" });

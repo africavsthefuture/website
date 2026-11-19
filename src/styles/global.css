@@ -555,3 +555,29 @@ a:hover { color: var(--gold-bright); }
 .entity-box dd { margin: 0; }
 @media (max-width: 560px) { .entity-box dl { grid-template-columns: 1fr; } .entity-box dd { margin-bottom: .5rem; } }
 .entity-channels { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem 1rem; }
+
+/* ── Thought Leaders store ─────────────────────────────────────────────── */
+.tl-head { display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: center; }
+.tl-head .tl-logo img { width: 112px; height: 112px; border-radius: var(--radius-lg); border: 1px solid var(--line-strong); object-fit: cover; }
+.tl-parent { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.tl-parent a { color: var(--teal-text); }
+@media (max-width: 600px) { .tl-head { grid-template-columns: 1fr; } .tl-head .tl-logo img { width: 80px; height: 80px; } }
+.product-card .card-media.square { aspect-ratio: 1/1; }
+.product-card .chip-gold { position: absolute; top: .75rem; left: .75rem; background: oklch(0.18 0.02 230 / 0.85); border-color: var(--gold); color: var(--gold); }
+.product-card .price, .product-detail .price { font-family: var(--font-mono); color: var(--gold); margin: .25rem 0 0; letter-spacing: .02em; }
+.product-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+.product-cover { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); background: var(--panel); }
+.product-cover img { width: 100%; height: auto; display: block; }
+.product-detail h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.08; margin: .4rem 0 .8rem; }
+.product-detail .prose p { color: var(--paper); line-height: 1.6; margin: 0 0 .8rem; max-width: 40rem; }
+.product-detail .price { font-size: 1.6rem; margin: 1.25rem 0 .75rem; }
+.product-buy { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+.product-note { font-size: .82rem; color: var(--muted); margin-top: .6rem; }
+.store-teaser { display: grid; grid-template-columns: auto 1fr auto; gap: 1.25rem; align-items: center; padding: 1.1rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--panel); }
+.store-teaser img { width: 64px; height: 64px; border-radius: var(--radius-md); object-fit: cover; }
+.store-teaser p { margin: .15rem 0 0; color: var(--muted); font-size: .92rem; }
+.store-teaser h2 { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin: 0; }
+@media (max-width: 800px) { .product-grid { grid-template-columns: 1fr; } .store-teaser { grid-template-columns: auto 1fr; } .store-teaser .btn { grid-column: 1 / -1; justify-self: start; } }
+.product-detail .prose ul { margin: 0 0 .9rem 1.1rem; padding: 0; color: var(--paper); line-height: 1.55; }
+.product-detail .prose li { margin: .3rem 0; }
+@media (min-width: 801px) { .product-cover { position: sticky; top: 96px; } }

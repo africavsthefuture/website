@@ -8,3 +8,4 @@ lighthouse/
 .env
 .env.*
 .firebase/
+logs/

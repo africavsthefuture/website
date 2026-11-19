@@ -36,10 +36,16 @@ export const site = {
   // store: renders /store, product pages, the Store nav link, Gumroad channel
   //        link and store sections. The Gumroad fetch keeps running so the data
   //        is ready when this is switched back on.
-  // miniBooks: mini-books are not ready, so they stay hidden even when the store is on.
+  // miniBooks: no separate mini-books section; mini-books stay hidden even when the store is
+  //            on, except those listed in store.approved (approved one by one by the user).
   // youtube: no YouTube channel yet (TikTok reels only; no content mirroring). false hides
   //          the YouTube channel link everywhere (incl. JSON-LD sameAs, llms.txt) and skips the feed fetch.
-  features: { store: false, miniBooks: false, youtube: false },
+  features: { store: true, miniBooks: false, youtube: false },
+
+  // Store: presented as Thought Leaders (Africa vs The Future is the parent brand).
+  // approved: Gumroad permalinks shown even though miniBooks is false
+  // (user approved all three published products on 19 Nov 2026).
+  store: { brand: "Thought Leaders", approved: ["lnoik", "jpomaa", "uidvue"] },
 
   // Covers: true = use each article's own feed artwork where it passed screening
   // (src/data/image-policy.mjs, with crops applied). Rejected/unscreened images
