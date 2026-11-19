@@ -1,11 +1,11 @@
 {
- "builtAt": "2026-11-19T18:43:51.220Z",
+ "builtAt": "2026-11-19T19:54:29.377Z",
  "report": {
-  "medium": "CACHE from 2026-11-19T18:43:21.975Z (OFFLINE=1)",
-  "substack": "CACHE from 2026-11-19T18:43:28.886Z (OFFLINE=1)",
+  "medium": "CACHE from 2026-11-19T19:53:53.389Z (OFFLINE=1)",
+  "substack": "CACHE from 2026-11-19T19:53:59.840Z (OFFLINE=1)",
   "youtube": "skipped (features.youtube=false)",
-  "soundcloud": "CACHE from 2026-11-19T18:43:31.397Z (OFFLINE=1)",
-  "bluesky": "CACHE from 2026-11-19T18:43:31.521Z (OFFLINE=1)",
-  "gumroad": "CACHE from 2026-11-19T18:43:33.338Z (OFFLINE=1)"
+  "soundcloud": "CACHE from 2026-11-19T19:54:02.168Z (OFFLINE=1)",
+  "bluesky": "CACHE from 2026-11-19T19:54:02.306Z (OFFLINE=1)",
+  "gumroad": "CACHE from 2026-11-19T19:54:04.409Z (OFFLINE=1)"
  }
 }

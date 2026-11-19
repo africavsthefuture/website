@@ -19,14 +19,8 @@ export const imagePolicy = [
   { id: "!x_dE!", verdict: "ok", note: "Translation Lag infographic (EV inline), no map" },
   { id: "artworks-iN3oLimeUXL5svGb", verdict: "ok", note: "Podcast ep. 001 art: blue circuit mask, no map" },
   { id: "artworks-k7qG8VEw8dIapy5w", verdict: "ok", note: "Podcast ep. 002 Vendors vs Economics: market vs city scene with microphones, no map (screened 19 Nov 2026)" },
-  // Gumroad product images (screened 19 Nov 2026).
-  { id: "4rkb4ixl56lv1mirlt24tpqtvyyq", verdict: "reject", note: "Issue 1 square thumbnail: two Africa continent maps" },
-  { id: "d2w5af62olt8d4c4fo0a5vlql81s", verdict: "reject", note: "Issue 1 main cover: large Africa continent map" },
-  { id: "wpl9o86fxcc6jzaq7d5e17yddclj", verdict: "ok", note: "Issue 1 second cover: inside-pages spread, 'Referenced. Short. Actionable.', no map" },
-  { id: "zn1m1k03n55nkw2iq682xjv55d2t", verdict: "reject", note: "Podcast Episode 1 cover: gold Africa map behind the title" },
-  { id: "9pwqedninb3z8bi17cbcz6l9z85t", verdict: "ok", note: "Podcast Episode 1 thumbnail: Thought Leaders portrait (same art as the site's TL portrait)" },
-  { id: "cxi0qliy7ghwina64d6vmulyoqp6", verdict: "ok-crop", crop: [0, 0, 1, 0.95], note: "Thought Leaders Series thumbnail: AI profile head against a city, no continent map; crop removes a white strip at the bottom" },
-  { id: "vv37942wbj9r9n2r52qmi1yqubbc", verdict: "reject", note: "Thought Leaders Series wide cover: world-map globe in the centre" },
+  // Store products are NOT screened here: each product shows its own main Gumroad cover
+  // (user, 19 Nov 2026: the no-maps rule covers the site's own design, not product covers).
 ];
 // Article → which screened image is its cover, when the feed's own cover isn't usable.
 export const coverOverride = { "china-built-the-worlds-best-evs-then": "!S87B!" };

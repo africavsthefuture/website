@@ -110,6 +110,17 @@ async function saveImage(url, name) {
   await im.jpeg({ quality: 90, mozjpeg: true }).toFile(path.join(IMG, file));
   return file;
 }
+// Store products: download the real Gumroad cover as-is (no policy screen, no crop),
+// capped at 1600px wide; Astro then makes AVIF/WebP at fixed sizes.
+async function saveProductCover(url, name) {
+  if (!url) return null;
+  const buf = await rawImage(url);
+  if (!buf) return null;
+  await fs.mkdir(IMG, { recursive: true });
+  const file = `${name}.jpg`;
+  await sharp(buf).flatten({ background: "#0F1923" }).resize({ width: 1600, withoutEnlargement: true }).jpeg({ quality: 88, mozjpeg: true }).toFile(path.join(IMG, file));
+  return file;
+}
 const pickCover = (slug, urls) => {
   const o = coverOverride[slug];
   return (o && urls.find((u) => u.includes(o))) || urls[0];
@@ -298,13 +309,15 @@ async function gumroad() {
     }
     const covers = pp.covers || [];
     const main = covers.find((c) => c.id === pp.main_cover_id) || covers[0];
-    // Candidate images in preference order; the first one passing image-policy is used.
-    const imageCandidates = [main?.original_url, ...covers.map((c) => c.original_url), pp.thumbnail_url || p.thumbnail_url].filter(Boolean);
+    // Product image = the product's own main Gumroad cover (first cover if no main is set,
+    // thumbnail as a last resort). Product covers are the seller's real artwork, so the
+    // site-design image policy (no maps) does not apply and no crop is made.
+    const coverUrl = main?.original_url || main?.url || covers[0]?.original_url || pp.thumbnail_url || p.thumbnail_url || null;
     products.push({
       id: p.id, permalink: p.permalink, name: cleanName(pp.name || p.name),
       price_cents, currency, recurrence, tiers, pwyw: !!(pp.is_pay_what_you_want || p.is_pay_what_you_want),
       url: pp.long_url || `${GUM()}/l/${p.permalink}`,
-      thumbnail: pp.thumbnail_url || p.thumbnail_url, imageCandidates,
+      thumbnail: pp.thumbnail_url || p.thumbnail_url, coverUrl,
       description: strip(pp.description_html || ""), paragraphs: paras(pp.description_html), summary: pp.summary || "",
       attributes: (pp.attributes || []).map((x) => ({ name: x.name, value: x.value })),
       refund: pp.refund_policy?.title || null,
@@ -316,13 +329,9 @@ async function gumroad() {
     p.kind = /podcast/i.test(p.name) ? "podcast" : p.native_type === "membership" || p.recurrence ? "membership" : m ? "mini-book" : "bundle";
     p.issue = m ? +m[1] : e ? +e[1] : null;
     p.slug = p.kind === "mini-book" ? `issue-${p.issue}` : p.kind === "podcast" ? `episode-${p.issue}` : slugify(p.name.replace(/^Africa vs The Future\s*-\s*/i, "")) || p.permalink;
-    p.image = null; p.imageSrc = null;
-    for (const u of p.imageCandidates) {
-      if (!usable(policyFor(u))) continue;
-      p.image = await saveImage(u, `product-${p.slug}`);
-      if (p.image) { p.imageSrc = u; break; }
-    }
-    delete p.imageCandidates;
+    p.image = await saveProductCover(p.coverUrl, `product-${p.slug}`);
+    p.imageSrc = p.image ? p.coverUrl : null;
+    delete p.coverUrl;
   }
   const order = { "mini-book": 0, podcast: 1, membership: 2, bundle: 3 };
   return products.sort((a, b) => order[a.kind] - order[b.kind] || (a.issue ?? 0) - (b.issue ?? 0));

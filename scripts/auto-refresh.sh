@@ -12,7 +12,7 @@ LOCK="$SITE/logs/.auto-refresh.lock"
 export PATH="/usr/local/bin:/home/box/.local/bin:/usr/bin:/bin"
 export HOME=/home/box
 # The box is shared and memory is tight: keep image processing lean.
-export VIPS_CONCURRENCY=1 UV_THREADPOOL_SIZE=2
+export VIPS_CONCURRENCY=1 UV_THREADPOOL_SIZE=1 NODE_OPTIONS=--max-old-space-size=1536
 mkdir -p "$SITE/logs"
 exec >>"$LOG" 2>&1
 ts() { date '+%Y-%m-%d %H:%M:%S %Z'; }
@@ -26,7 +26,9 @@ DATA_FILES=(src/data/medium.json src/data/substack.json src/data/soundcloud.json
 data_hash() { cat "${DATA_FILES[@]}" 2>/dev/null | sha256sum | cut -d' ' -f1; }
 
 log "start"
-if ! timeout 25m npm run build >"$SITE/logs/last-build.log" 2>&1; then
+build() { timeout 25m npm run build >"$SITE/logs/last-build.log" 2>&1; }
+# One retry: the shared box sometimes runs short of memory (exit 137).
+if ! build && { log "build failed; retrying once in 60s"; sleep 60; ! build; }; then
   log "BUILD FAILED; no deploy. Tail of logs/last-build.log:"; tail -n 20 "$SITE/logs/last-build.log"; exit 1
 fi
 grep '^\[fetch\]' "$SITE/logs/last-build.log"

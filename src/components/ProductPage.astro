@@ -54,17 +54,17 @@ const metaDesc = `${kindLabel(p)}, ${priceLabel(p)} on Gumroad. ${summary}`.repl
   <div class="wrap" style="padding-top:2rem">
     <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/store">{brand}</a> / <span>{name}</span></nav>
     <div class="product-grid">
-      <div class="product-cover">{i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[400, 640, 1000]} sizes="(min-width: 900px) 560px, 92vw" alt={remote ? `Gumroad artwork for ${name}, ${brand}` : `Generated cover for ${name}, ${brand}`} loading="eager" fetchpriority="high" /> : <div class="card-media-fallback">VS</div>}</div>
+      <div class="product-cover">{i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[400, 640, 1000]} sizes="(min-width: 900px) 560px, 92vw" alt={remote ? `Cover of ${name} (${kindLabel(p)}), ${brand}` : `Generated cover for ${name}, ${brand}`} loading="eager" fetchpriority="high" /> : <div class="card-media-fallback">VS</div>}</div>
       <div class="product-detail">
         <p class="eyebrow">{kindLabel(p)} · {brand}</p>
         <h1>{name}</h1>
-        {summary && <p class="lede">{summary}</p>}
-        <p class="price">{priceLabel(p)}</p>
+        <p class="price" style="margin-top:.25rem">{priceLabel(p)}</p>
         <div class="product-buy">
           <a class="btn btn-gold" href={buy} rel="noopener">{p.recurrence ? "Join on Gumroad ↗" : "Buy on Gumroad ↗"}</a>
           <a class="btn btn-ghost" href="/store">All {brand}</a>
         </div>
         <p class="product-note">Checkout, payment and delivery are handled by Gumroad.{p.currency !== "GBP" && ` Listed in ${p.currency}; Gumroad may show your local currency at checkout.`}{p.recurrence && " Billed monthly until cancelled on Gumroad."}</p>
+        {summary && <p class="lede" style="margin-top:1.25rem">{summary}</p>}
         <div class="prose" style="margin-top:1.75rem">{blocks.map((b) => b.list ? <ul>{b.list.map((t) => <li>{t}</li>)}</ul> : <p>{b.p}</p>)}</div>
         <div style="margin-top:1.75rem"><KeyFacts facts={facts} title="Details" /></div>
       </div>

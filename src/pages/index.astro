@@ -204,8 +204,11 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
     <div class="wrap">
       <div class="store-teaser">
         <Picture src={tlLogo} formats={["avif"]} fallbackFormat="webp" widths={[64, 128]} sizes="64px" alt="Thought Leaders logo" loading="lazy" />
-        <div><h2 id="store-title">Thought Leaders</h2><p>The optional paid series: {storeItems.map((p) => `${shortName(p)} (${priceLabel(p)})`).join("; ")}.</p></div>
-        <a class="btn btn-ghost btn-sm" href="/store">See Thought Leaders</a>
+        <div><h2 id="store-title"><a href="/store">Thought Leaders</a></h2><p>The optional paid series, sold on Gumroad.</p></div>
+        <ul class="teaser-items">{storeItems.map((p) => (
+          <li><a class="teaser-name" href={productPath(p)}>{shortName(p)}</a> <span class="teaser-price">{priceLabel(p)}</span>
+            <a class="btn btn-gold btn-sm" href={utm(p.url, "store", `home_buy_${p.slug}`)} rel="noopener">{p.recurrence ? "Join on Gumroad ↗" : "Buy on Gumroad ↗"}</a></li>))}
+        </ul>
       </div>
     </div>
   </section>)}
