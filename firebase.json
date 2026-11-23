@@ -19,6 +19,16 @@
         "type": 301
       },
       {
+        "source": "/briefing",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/briefing.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
         "source": "/index.html",
         "destination": "/",
         "type": 301

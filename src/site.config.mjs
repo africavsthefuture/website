@@ -15,14 +15,6 @@ export const site = {
   welcome: "Welcome to Africa vs The Future. Our goal is to help inspire traction and real world action in dealing with the often ignored underlying challenges facing Africa in the 21st century.",
   signupNote: "Free articles and podcast episodes. Unsubscribe anytime.",
 
-  // Lead magnet. status "coming-soon" until the guide is published; then set "live"
-  // (and add deliveryUrl) and the hero/offer copy switches to "Get the free Briefing".
-  briefing: {
-    title: "The Hidden Architecture Briefing",
-    subtitle: "5 often-ignored challenges facing Africa's future, and the alternative view",
-    status: "coming-soon",
-    path: "/briefing",
-  },
   // Social handles (used for twitter:site and the entity description).
   x: { handle: "@AfricaVTFuture" },
   tiktok: { handle: "@africavsfuture0" },

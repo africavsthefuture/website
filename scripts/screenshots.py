@@ -1,7 +1,7 @@
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 B = "http://127.0.0.1:4321"
-pages = [("home", "/"), ("article", "/articles/reality-check-could-copper-do-for"), ("articles", "/articles"), ("podcast", "/podcast"), ("about", "/about"), ("briefing", "/briefing"), ("404", "/nope")]
+pages = [("home", "/"), ("article", "/articles/reality-check-could-copper-do-for"), ("articles", "/articles"), ("podcast", "/podcast"), ("about", "/about"), ("404", "/nope")]
 out = {}
 async def main():
     async with async_playwright() as p:

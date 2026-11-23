@@ -43,7 +43,7 @@ const ld = [{ ...episodeLd(e, n), "@context": "https://schema.org" }, podcastSer
           <h2 id="ep-brief" class="eyebrow">About this episode</h2>
           <p class="answer-summary">{e.excerpt}</p>
         </section>
-        {cover && <div class="summary-hero" style="max-width:420px"><Picture src={cover} formats={["avif"]} fallbackFormat="webp" widths={[320, 640]} sizes="(min-width: 600px) 420px, 100vw" alt={remote ? `Episode artwork for “${e.title}”` : `Abstract teal-and-gold cover for “${e.title}”`} loading="eager" /></div>}
+        {cover && <div class="episode-art" style="max-width:420px"><Picture src={cover} formats={["avif"]} fallbackFormat="webp" widths={[320, 640]} sizes="(min-width: 600px) 420px, 100vw" alt={remote ? `Episode artwork for “${e.title}”` : `Abstract teal-and-gold cover for “${e.title}”`} loading="eager" /></div>}
         {e.audio && <p><audio controls preload="none" src={e.audio}><a href={e.url}>Listen on SoundCloud</a></audio></p>}
         <p class="also-on">Also on <a href={utm(e.url, "listen", "episode_page")} rel="noopener">SoundCloud ↗</a></p>
         <div class="band essay-signup">

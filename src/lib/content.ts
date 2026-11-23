@@ -20,7 +20,20 @@ export type Article = {
   platform: "medium" | "substack"; slug: string; title: string; url: string; author: string;
   published: string; updated?: string | null; tags: string[]; subtitle?: string; excerpt: string; body?: string; words?: number;
   image?: string | null; imageSrc?: string | null;
+  paid?: boolean; audience?: string | null;
 };
+
+// Paid = Medium member-only or Substack paywalled (audience only_paid / founding).
+// Falls back to tags/audience if a feed record predates the paid field.
+export function isPaidArticle(a: Article): boolean {
+  if (a.paid === true) return true;
+  if (a.paid === false) return false;
+  const tags = (a.tags || []).map((t) => t.toLowerCase());
+  if (tags.some((t) => /member-only|members-only|^paid$|only.?paid|^founding$/.test(t))) return true;
+  const aud = (a.audience || "").toLowerCase();
+  if (aud && aud !== "everyone" && /paid|founding/.test(aud)) return true;
+  return false;
+}
 
 // Article bodies arrive with h2/h3/h4 depending on the platform. The page H1 is the
 // title, so shift body headings until the top level is h2 (no h1→h3 jumps).

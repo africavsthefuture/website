@@ -1,18 +1,31 @@
 ---
 import { Picture } from "astro:assets";
-import { img, coverImg, fmtDate, platformLabel, type Article } from "../lib/content";
+import { img, coverImg, fmtDate, isPaidArticle, type Article } from "../lib/content";
 import { topicOf } from "../lib/cover.mjs";
+import communityPortrait from "../assets/brand/community-hero.jpg";
+import tlPortrait from "../assets/brand/tl-portrait.jpg";
 const { a, big = false, eager = false } = Astro.props as { a: Article; big?: boolean; eager?: boolean };
 const remote = img(a.image);
 const i = remote ?? coverImg(`article-${a.slug}`);
 const topic = topicOf(`${a.title} ${a.tags.join(" ")}`).label;
 const alt = remote ? `Cover image for “${a.title}”` : `Abstract teal-and-gold ${topic.toLowerCase()} motif for “${a.title}”`;
+// Free Community articles use the woman (Community) portrait; paid/member pieces use
+// the man (Thought Leaders). Generated fallback covers already include the matching
+// portrait, so the CSS panel is only layered onto the article's own image.
+const paid = isPaidArticle(a);
+const mark = paid ? tlPortrait : communityPortrait;
+const markAlt = paid ? "Thought Leaders portrait" : "Community portrait";
 ---
 <article class:list={["card", "article-card", { big }]}>
   <a href={`/articles/${a.slug}`} class="card-link">
     <div class="card-media">
       {i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={big ? [480, 800, 1200] : [400, 640]} sizes={big ? "(min-width: 900px) 60vw, 100vw" : "(min-width: 900px) 30vw, 100vw"} alt={alt} loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : "auto"} />
          : <div class="card-media-fallback" aria-hidden="true">VS</div>}
+      {remote && (
+        <div class="card-mark" aria-hidden="true">
+          <Picture src={mark} formats={["avif"]} fallbackFormat="webp" widths={[240, 400]} sizes="12vw" alt={markAlt} loading={eager ? "eager" : "lazy"} />
+        </div>
+      )}
       <span class="chip chip-read">{a.words ? `${Math.max(1, Math.round(a.words / 230))} min read` : "Article"}</span>
       <span class="chip chip-topic">{topic}</span>
     </div>

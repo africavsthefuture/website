@@ -48,7 +48,7 @@ The home hero visual (`src/components/SignalField.astro`) is inline SVG with CSS
 - `/articles` and `/articles/<slug>`: every article in full. The canonical is this site; Medium/Substack are listed as `sameAs`. Each article opens with an "In brief" block whose summary and key points are verbatim quotes from the article (`src/data/key-points.mjs`; the build drops any line that is not found word-for-word in the article text). New articles without an entry fall back to their subtitle or opening sentences.
 - `/podcast` and `/podcast/<slug>`: one page per SoundCloud episode.
 - `/store/...`: only built when `features.store` is `true` (catch-all route `src/pages/store/[...path].astro`)
-- `/about` (includes the "About AvtF" entity block and the FAQ / FAQPage), `/contact`, `/privacy`, `/briefing`
+- `/about` (includes the "About AvtF" entity block and the FAQ / FAQPage), `/contact`, `/privacy`
 - A real `/404`
 - `/thought-leaders` redirects to `/#subscribe` (the Substack subscribe section)
 - Machine-readable: `/robots.txt`, `/sitemap.xml` (copy of `/sitemap-index.xml`, written by `scripts/postbuild.mjs`), `/sitemap-0.xml` (lastmod from the feeds), `/rss.xml` (full-text articles), `/llms.txt`, `/llms-full.txt` (every article as markdown), `/ads.txt`, `/<indexNowKey>.txt`

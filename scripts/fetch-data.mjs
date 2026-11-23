@@ -75,6 +75,19 @@ const slugify = (s) => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, ""
 const arr = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
 const txt = (x) => (x && typeof x === "object" ? x["#text"] ?? "" : x ?? "");
 
+
+// Paid/member detection: Medium member-only categories or paywall copy; Substack
+// archive `audience` other than "everyone" (only_paid, founding, etc.).
+const PAID_TAG = /member-only|members-only|^paid$|only.?paid|^founding$/i;
+const PAID_HTML = /member-only story|this story is for medium members|medium members only/i;
+const isPaidTag = (tags = []) => tags.some((x) => PAID_TAG.test(String(x)));
+const isPaidMedium = (tags, html = "") => isPaidTag(tags) || PAID_HTML.test(String(html));
+const isPaidSubstack = (audience, tags = []) => {
+  const aud = String(audience || "").toLowerCase();
+  if (aud && aud !== "everyone" && /paid|founding/.test(aud)) return true;
+  return isPaidTag(tags);
+};
+
 // Screened image pipeline: only images approved in src/data/image-policy.mjs are
 // downloaded; the approved crop is applied, then Astro (covers) or sharp (inline)
 // produces AVIF/WebP. Raw downloads are cached so OFFLINE builds still work.
@@ -192,6 +205,7 @@ async function medium() {
       excerpt: words(strip(html), 70),
       body: restoreImages(cleanBody(inl.html), inl.toks), words: wordCount(html),
       image: await saveImage(img, `article-${slug}`), imageSrc: img || null,
+      paid: isPaidMedium(arr(i.category).map((c) => decode(txt(c))), html),
     });
   }
   return out;
@@ -199,6 +213,11 @@ async function medium() {
 
 async function substack() {
   const feed = xml.parse(await get(site.feeds.substack));
+  const audienceBySlug = {};
+  try {
+    const arch = await get("https://africavsfuture.substack.com/api/v1/archive?sort=new&limit=20", { type: "json", timeout: 15000 });
+    for (const p of (arch.posts || arch || [])) if (p?.slug) audienceBySlug[p.slug] = p.audience || "everyone";
+  } catch (e) { console.warn("[fetch] substack archive (audience) failed:", e.message); }
   const out = [];
   for (const i of arr(feed.rss.channel.item)) {
     const link = String(txt(i.link)).split("?")[0];
@@ -216,6 +235,8 @@ async function substack() {
       excerpt: words(body, 70),
       body: restoreImages(cleanBody(inl.html), inl.toks), words: body.split(" ").filter(Boolean).length,
       image: await saveImage(img, `article-${sslug}`), imageSrc: img || null,
+      audience: audienceBySlug[sslug] || null,
+      paid: isPaidSubstack(audienceBySlug[sslug], arr(i.category).map((c) => decode(txt(c)))),
     });
   }
   return out;

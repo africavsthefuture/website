@@ -1,5 +1,6 @@
 ---
 // Store card: image + title open the product page; the gold button goes straight to Gumroad.
+// Kind label sits in the body so it never covers the cover art.
 import { Picture } from "astro:assets";
 import { img, coverImg, priceLabel, productPath, displayName, kindLabel, type Product } from "../lib/content";
 import { utm } from "../site.config.mjs";
@@ -14,10 +15,10 @@ const buy = utm(p.url, "store", `${placement}_buy_${p.slug}`);
     <div class="card-media cover">
       {i ? <Picture src={i} formats={["avif"]} fallbackFormat="webp" widths={[400, 640]} sizes="(min-width: 900px) 30vw, 90vw" alt={remote ? `Cover of ${name} (${kindLabel(p)}), Thought Leaders` : `Generated cover for ${name}, Thought Leaders`} loading="lazy" />
          : <div class="card-media-fallback" aria-hidden="true">VS</div>}
-      <span class="chip chip-gold">{kindLabel(p)}</span>
     </div>
   </a>
   <div class="card-body">
+    <p class="kicker">{kindLabel(p)}</p>
     <h3 class="card-title"><a href={productPath(p)}>{name}</a></h3>
     <p class="price">{priceLabel(p)}</p>
     <p class="card-buy"><a class="btn btn-gold btn-sm" href={buy} rel="noopener">{p.recurrence ? "Join on Gumroad ↗" : "Buy on Gumroad ↗"}</a></p>

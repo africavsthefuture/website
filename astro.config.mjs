@@ -25,9 +25,9 @@ export default defineConfig({
   trailingSlash: "never",
   build: { format: "file", inlineStylesheets: "always" },
   compressHTML: true,
-  redirects: { "/thought-leaders": "/#subscribe" },
+  redirects: { "/thought-leaders": "/#subscribe", "/briefing": "/" },
   integrations: [sitemap({
-    filter: (p) => !p.includes("/404") && !/\/thought-leaders\/?$/.test(p),
+    filter: (p) => !p.includes("/404") && !/\/thought-leaders\/?$/.test(p) && !/\/briefing\/?$/.test(p),
     serialize(item) {
       const url = item.url.replace(/\/$/, "") || item.url;
       const key = url === SITE ? `${SITE}/` : url;

@@ -50,8 +50,7 @@ const ld = [org, webSite, ...(breadcrumbLd ? [breadcrumbLd] : []), ...jsonld];
 const nav = [
   { href: "/articles", label: "Articles" },
   { href: "/podcast", label: "Podcast" },
-  ...(site.features.store ? [{ href: "/store", label: "Thought Leaders" }] : []),
-  { href: site.briefing.path, label: "Free Briefing" },
+  ...(site.features.store ? [{ href: "/store", label: "Store" }] : []),
   { href: "/about", label: "About" },
 ];
 const here = (h: string) => path === h || path.startsWith(h + "/");
@@ -150,7 +149,7 @@ const adsCfg = site.ads.enabled ? JSON.stringify({ exchanges: site.ads.exchanges
         ))}
       </ul>
       <div class="footer-bottom">
-        <nav aria-label="Footer"><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/rss.xml">RSS</a><a href="/llms.txt">llms.txt</a><a href="/sitemap.xml">Sitemap</a></nav>
+        <nav aria-label="Footer"><a href="/about">About</a>{site.features.store && <a href="/store">Store</a>}<a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/rss.xml">RSS</a><a href="/llms.txt">llms.txt</a><a href="/sitemap.xml">Sitemap</a></nav>
         <p>© {new Date().getFullYear()} {site.name}</p>
       </div>
     </div>

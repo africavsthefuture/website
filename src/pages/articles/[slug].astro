@@ -2,7 +2,6 @@
 import { Picture } from "astro:assets";
 import Base from "../../layouts/Base.astro";
 import SubscribeForm from "../../components/SubscribeForm.astro";
-import BriefingOffer from "../../components/BriefingOffer.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import KeyFacts from "../../components/KeyFacts.astro";
@@ -85,14 +84,13 @@ const facts = [
           <div>
             <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Enjoyed this?</p>
             <h2>Get the next article by email.</h2>
-            <p>Free, from {site.name}. Plus {site.briefing.title} when it's released.</p>
+            <p>Free, from {site.name}. Every article and podcast episode as it is released.</p>
           </div>
           <SubscribeForm placement={`article_${a.slug}`.slice(0, 60)} id="email-article" />
         </div>
       </article>
       <aside>
         <KeyFacts facts={facts} title="About this article" />
-        <BriefingOffer variant="compact" />
         <AdSlot kind="rail" id="article-rail-1" />
       </aside>
     </div>

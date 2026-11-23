@@ -17,7 +17,6 @@ export const GET: APIRoute = () => {
     `- [Podcast](${site.url}/podcast): the free Community podcast`,
     ...(site.features.store ? [`- [${site.store.brand}](${site.url}/store): the paid series (mini-book, podcast episode, membership) on Gumroad`] : []),
     `- [About](${site.url}/about): who ${site.shortName} is, its stance and official channels`,
-    `- [${site.briefing.title}](${site.url}${site.briefing.path}): free guide, ${site.briefing.status === "live" ? "available to subscribers" : "coming soon"}`,
     `- [Full text of every article](${site.url}/llms-full.txt)`,
     `- [RSS feed](${site.url}/rss.xml)`,
     `- [Sitemap](${site.url}/sitemap.xml)`, "");

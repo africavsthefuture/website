@@ -66,20 +66,52 @@ for (const f of await fs.readdir("src/assets/covers")) if (f.startsWith("product
 
 const jobs = [];
 // Branded fallback cover (used only where the article's own art was rejected):
-// generated motif + teal-washed Thought Leaders portrait + topic kicker.
-const tlWash = await sharp("src/assets/brand/tl-portrait.jpg").resize(460, 675, { fit: "cover", position: "top" })
-  .composite([{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="460" height="675"><defs><linearGradient id="w" x1="0" x2="1"><stop offset="0" stop-color="${INK}"/><stop offset=".45" stop-color="#2A7266" stop-opacity=".35"/><stop offset="1" stop-color="#2A7266" stop-opacity=".15"/></linearGradient></defs><rect width="460" height="675" fill="url(#w)"/></svg>`) }]).toBuffer();
+// generated motif + a smoothly faded Community (free) or Thought Leaders (paid)
+// portrait on the right, no hard seam.
+const PANEL_W = 520, PANEL_H = 675;
+const fadeMask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${PANEL_W}" height="${PANEL_H}">
+  <defs><linearGradient id="m" x1="0" x2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0"/>
+    <stop offset=".32" stop-color="#000" stop-opacity=".55"/>
+    <stop offset=".55" stop-color="#000" stop-opacity="1"/>
+  </linearGradient></defs>
+  <rect width="${PANEL_W}" height="${PANEL_H}" fill="url(#m)"/>
+</svg>`);
+const tealWash = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${PANEL_W}" height="${PANEL_H}">
+  <defs><linearGradient id="w" x1="0" x2="1">
+    <stop offset="0" stop-color="${INK}" stop-opacity="0"/>
+    <stop offset=".4" stop-color="#2A7266" stop-opacity=".28"/>
+    <stop offset="1" stop-color="#2A7266" stop-opacity=".2"/>
+  </linearGradient></defs>
+  <rect width="${PANEL_W}" height="${PANEL_H}" fill="url(#w)"/>
+</svg>`);
+async function logoPanel(paid) {
+  const src = paid ? "src/assets/brand/tl-portrait.jpg" : "src/assets/brand/community-hero.jpg";
+  const pos = paid ? "top" : "left";
+  const portrait = await sharp(src).resize(PANEL_W, PANEL_H, { fit: "cover", position: pos }).toBuffer();
+  const faded = await sharp(portrait).composite([{ input: fadeMask, blend: "dest-in" }]).png().toBuffer();
+  return sharp(faded).composite([{ input: tealWash, blend: "over" }]).png().toBuffer();
+}
 const { topicOf } = await import("../src/lib/cover.mjs");
+const isPaidArticle = (a) => {
+  if (a.paid === true) return true;
+  if (a.paid === false) return false;
+  const tags = (a.tags || []).map((x) => String(x).toLowerCase());
+  if (tags.some((x) => /member-only|members-only|^paid$|only.?paid|^founding$/.test(x))) return true;
+  const aud = String(a.audience || "").toLowerCase();
+  return !!(aud && aud !== "everyone" && /paid|founding/.test(aud));
+};
 async function fallbackCover(a, text) {
   const bg = await sharp(Buffer.from(coverSvg({ seed: a.slug, text, label: "" }))).png().toBuffer();
   const topic = topicOf(text).label.toUpperCase();
+  const panel = await logoPanel(isPaidArticle(a));
   const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675">
     <rect x="0" y="0" width="1200" height="675" fill="none" stroke="#E09D3E" stroke-opacity=".35" stroke-width="2"/>
     <rect x="56" y="56" width="${topic.length * 14 + 150}" height="40" rx="6" fill="${INK}" fill-opacity=".8" stroke="#3F8E7C"/>
     <text x="76" y="83" font-family="IBM Plex Mono" font-weight="600" font-size="18" letter-spacing="3" fill="#E09D3E">AvtF · ${esc(topic)}</text>
     <rect x="56" y="580" width="56" height="6" fill="#E09D3E"/>
   </svg>`;
-  return sharp(bg).composite([{ input: tlWash, left: 740, top: 0 }, { input: Buffer.from(overlay) }]).png({ compressionLevel: 9 }).toFile(`src/assets/covers/article-${a.slug}.png`);
+  return sharp(bg).composite([{ input: panel, left: 680, top: 0 }, { input: Buffer.from(overlay) }]).png({ compressionLevel: 9 }).toFile(`src/assets/covers/article-${a.slug}.png`);
 }
 async function articleOg(a, text, { coverFile, out, kicker } = {}) {
   coverFile ??= a.image ? `src/assets/remote/${a.image}` : `src/assets/covers/article-${a.slug}.png`;

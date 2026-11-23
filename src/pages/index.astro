@@ -7,7 +7,6 @@ import ProductCard from "../components/ProductCard.astro";
 import AdSlot from "../components/AdSlot.astro";
 import Faq from "../components/Faq.astro";
 import KeyFacts from "../components/KeyFacts.astro";
-import BriefingOffer from "../components/BriefingOffer.astro";
 import ChannelIcon from "../components/ChannelIcon.astro";
 import { site, utm, liveChannels } from "../site.config.mjs";
 import { articles, episodes, posts, products, img, coverImg, price, priceLabel, displayName, shortName, productPath, fmtDate } from "../lib/content";
@@ -70,8 +69,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
         <ul class="topic-rail" aria-label="Topics we cover">{topics.map((t) => <li>{t}</li>)}</ul>
         <h1 data-split-h1>African ownership of narrative <span class="gold">next</span>.</h1>
         <p class="lede">{site.supportLine}</p>
-        <SubscribeForm placement="hero" id="email-hero" cta={site.briefing.status === "live" ? "Get the free Briefing" : "Subscribe free"} />
-        <p class="hero-alt"><a href={site.briefing.path}><span class="brief-stamp">{site.briefing.status === "live" ? "Free" : "Soon"}</span> {site.briefing.title}: get it free when you subscribe →</a></p>
+        <SubscribeForm placement="hero" id="email-hero" />
         <div class="platform-row" aria-label="Channels">
           <span class="label">Follow</span>
           {platformRow.map((c) => (
@@ -128,18 +126,11 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
     </div>
   </section>
 
-  <section class="section" aria-labelledby="briefing-home">
-    <div class="wrap">
-      <span class="section-num">02 / Free guide</span>
-      <BriefingOffer placement="briefing_home" id="briefing-home" />
-    </div>
-  </section>
-
   <section class="section" aria-labelledby="tiers-title">
     <div class="wrap">
       <div class="section-head">
         <div>
-          <span class="section-num">03 / Choose your depth</span>
+          <span class="section-num">02 / Choose your depth</span>
           <h2 id="tiers-title" class="section-title">Free Community <span style="color:var(--gold)">vs</span> Thought Leaders</h2>
         </div>
       </div>
@@ -181,7 +172,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
   <section class="section" aria-labelledby="listen-title">
     <div class="wrap two-col">
       <div>
-        <span class="section-num">04 / Listen</span>
+        <span class="section-num">03 / Listen</span>
         <h2 id="listen-title" class="section-title">The podcast</h2>
         <p class="lede">The free Community podcast on SoundCloud.</p>
         <a class="text-link" href="/podcast">All episodes →</a>
@@ -216,7 +207,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
   <section class="section" aria-labelledby="discussion-title">
     <div class="wrap two-col">
       <div>
-        <span class="section-num">05 / Discuss</span>
+        <span class="section-num">04 / Discuss</span>
         <h2 id="discussion-title" class="section-title">Current discussion</h2>
         <p class="lede">Recent posts from Bluesky, updated at every build.</p>
         <div class="posts">
@@ -242,7 +233,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
   <section class="section" aria-labelledby="facts-title">
     <div class="wrap two-col">
       <div>
-        <span class="section-num">06 / In brief</span>
+        <span class="section-num">05 / In brief</span>
         <h2 id="facts-title" class="section-title">Key facts</h2>
         <KeyFacts facts={facts} title="Africa vs The Future at a glance" />
       </div>
@@ -256,7 +247,7 @@ const platformRow = liveChannels().filter((c) => ["substack", "medium", "soundcl
         <div>
           <p class="kicker" style="color:oklch(0.18 0.02 230 / 0.7)">Never miss a release</p>
           <h2 id="band-title">Get every article by email.</h2>
-          <p>New articles and episodes as they land, plus {site.briefing.title} when it's released.</p>
+          <p>New articles and episodes as they land.</p>
         </div>
         <div>
           <SubscribeForm placement="band" id="email-band" />
